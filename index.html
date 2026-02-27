@@ -28,6 +28,15 @@ body {
     background-attachment: fixed;
     background-position: center;
 }
+/* 标签页基础样式：默认隐藏 */
+.tab-pane {
+    display: none;
+}
+
+/* 当前激活的标签页显示 */
+.tab-pane.active {
+    display: block;
+}
 
 /* ---------- 标签导航 ---------- */
 .tabs {
@@ -1437,40 +1446,7 @@ if (savedTab) {
     if (btn) btn.click();
 }
 
-tabBtns.forEach(btn => {
-    btn.addEventListener('click', function() {
-        const target = this.dataset.tab;
-        // 移除所有激活类
-        tabBtns.forEach(b => b.classList.remove('active'));
-        tabPanes.forEach(p => p.classList.remove('active'));
-        // 激活当前
-        this.classList.add('active');
-        document.getElementById(target).classList.add('active');
-        sessionStorage.setItem('activeTab', target);
 
-        // 图片页重新布局（完全保留你原来的逻辑）
-        if (target === 'photos') {
-            setTimeout(() => {
-                if (isMobile()) {
-                    document.querySelectorAll('.card').forEach(card => {
-                        const images = card.querySelectorAll('.card-images img');
-                        if (images.length > 2) {
-                            for (let i = 2; i < images.length; i++) {
-                                images[i].style.display = 'none';
-                            }
-                        }
-                    });
-                } else {
-                    if (masonryInstance) {
-                        masonryInstance.layout();
-                    } else {
-                        initMasonry();
-                    }
-                }
-            }, 100);
-        }
-    });
-});
         
        
             // ---------- 随机背景图 ----------
