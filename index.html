@@ -1388,27 +1388,57 @@ header h1 {
                 return window.innerWidth < 768;
             }
 
-           // ---------- 标签切换逻辑（简化版）----------
+         // ---------- 标签切换逻辑 ----------
 const tabBtns = document.querySelectorAll('.tab-btn');
 const tabPanes = document.querySelectorAll('.tab-pane');
 
-// 先强制重置所有激活状态
-tabPanes.forEach(p => p.classList.remove('active'));
-tabBtns.forEach(b => b.classList.remove('active'));
-
-// 激活默认标签（这里设置为 'photos'，你可以改成 'wiki'）
-const defaultTab = 'photos';
-const defaultBtn = document.querySelector(`.tab-btn[data-tab="${defaultTab}"]`);
-const defaultPane = document.getElementById(defaultTab);
-if (defaultBtn && defaultPane) {
-    defaultBtn.classList.add('active');
-    defaultPane.classList.add('active');
-}
+// 移除所有激活状态，设置默认显示 'photos'
+tabBtns.forEach(btn => btn.classList.remove('active'));
+tabPanes.forEach(pane => pane.classList.remove('active'));
+document.querySelector('.tab-btn[data-tab="photos"]').classList.add('active');
+document.getElementById('photos').classList.add('active');
 
 // 绑定点击事件
 tabBtns.forEach(btn => {
-    btn.addEventListener('click', function(e) {
-        e.preventDefault();
+    btn.addEventListener('click', function() {
+        const target = this.dataset.tab;
+        tabBtns.forEach(b => b.classList.remove('active'));
+        tabPanes.forEach(p => p.classList.remove('active'));
+        this.classList.add('active');
+        document.getElementById(target).classList.add('active');
+        sessionStorage.setItem('activeTab', target);
+
+        // 图片页重新布局
+        if (target === 'photos') {
+            setTimeout(() => {
+                if (window.innerWidth < 768) {
+                    document.querySelectorAll('.card').forEach(card => {
+                        const imgs = card.querySelectorAll('.card-images img');
+                        if (imgs.length > 2) {
+                            for (let i = 2; i < imgs.length; i++) {
+                                imgs[i].style.display = 'none';
+                            }
+                        }
+                    });
+                } else {
+                    if (masonryInstance) {
+                        masonryInstance.layout();
+                    }
+                }
+            }, 100);
+        }
+    });
+});
+
+// 恢复上次保存的标签页
+const savedTab = sessionStorage.getItem('activeTab');
+if (savedTab) {
+    const btn = document.querySelector(`.tab-btn[data-tab="${savedTab}"]`);
+    if (btn) btn.click();
+}
+
+tabBtns.forEach(btn => {
+    btn.addEventListener('click', function() {
         const target = this.dataset.tab;
         // 移除所有激活类
         tabBtns.forEach(b => b.classList.remove('active'));
@@ -1416,37 +1446,12 @@ tabBtns.forEach(btn => {
         // 激活当前
         this.classList.add('active');
         document.getElementById(target).classList.add('active');
-        // 保存到 sessionStorage
         sessionStorage.setItem('activeTab', target);
 
-        // 如果是图片页，重新布局
-        if (target === 'photos') {
-            setTimeout(() => {
-                if (window.innerWidth < 768) {
-                    document.querySelectorAll('.card').forEach(card => {
-                        const imgs = card.querySelectorAll('.card-images img');
-                        if (imgs.length > 2) {
-                            for (let i = 2; i < imgs.length; i++) imgs[i].style.display = 'none';
-                        }
-                    });
-                } else {
-                    if (masonryInstance) masonryInstance.layout();
-                    else initMasonry();
-                }
-            }, 100);
-        }
-
-// 恢复上次保存的标签页（如果有）
-const savedTab = sessionStorage.getItem('activeTab');
-if (savedTab) {
-    const btn = document.querySelector(`.tab-btn[data-tab="${savedTab}"]`);
-    if (btn) btn.click();
-}
-        // ---------- 新增：切换到图片页时重新布局 ----------
+        // 图片页重新布局（完全保留你原来的逻辑）
         if (target === 'photos') {
             setTimeout(() => {
                 if (isMobile()) {
-                    // 手机端：重新隐藏多余图片（如果之前显示乱了）
                     document.querySelectorAll('.card').forEach(card => {
                         const images = card.querySelectorAll('.card-images img');
                         if (images.length > 2) {
@@ -1456,17 +1461,18 @@ if (savedTab) {
                         }
                     });
                 } else {
-                    // 电脑端：重新触发 Masonry 布局
                     if (masonryInstance) {
                         masonryInstance.layout();
                     } else {
-                        initMasonry(); // 如果实例不存在，重新初始化
+                        initMasonry();
                     }
                 }
-            }, 100); // 延迟一点等待标签页显示
+            }, 100);
         }
     });
-});         
+});
+        
+       
             // ---------- 随机背景图 ----------
 function setRandomBackground() {
     // 定义横屏图和竖屏图数组
