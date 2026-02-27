@@ -1388,36 +1388,60 @@ header h1 {
                 return window.innerWidth < 768;
             }
 
-            // ---------- 标签切换逻辑 ----------
-            const tabBtns = document.querySelectorAll('.tab-btn');
-            const tabPanes = document.querySelectorAll('.tab-pane');
+           // ---------- 标签切换逻辑（简化版）----------
+const tabBtns = document.querySelectorAll('.tab-btn');
+const tabPanes = document.querySelectorAll('.tab-pane');
 
-            const savedTab = sessionStorage.getItem('activeTab');
-            if (savedTab) {
-                const targetBtn = document.querySelector(`.tab-btn[data-tab="${savedTab}"]`);
-                const targetPane = document.getElementById(savedTab);
-                if (targetBtn && targetPane) {
-                    tabBtns.forEach(b => b.classList.remove('active'));
-                    tabPanes.forEach(p => p.classList.remove('active'));
-                    targetBtn.classList.add('active');
-                    targetPane.classList.add('active');
-                }
-            }
+// 先强制重置所有激活状态
+tabPanes.forEach(p => p.classList.remove('active'));
+tabBtns.forEach(b => b.classList.remove('active'));
 
-            tabBtns.forEach(btn => {
-    btn.addEventListener('click', () => {
+// 激活默认标签（这里设置为 'photos'，你可以改成 'wiki'）
+const defaultTab = 'photos';
+const defaultBtn = document.querySelector(`.tab-btn[data-tab="${defaultTab}"]`);
+const defaultPane = document.getElementById(defaultTab);
+if (defaultBtn && defaultPane) {
+    defaultBtn.classList.add('active');
+    defaultPane.classList.add('active');
+}
+
+// 绑定点击事件
+tabBtns.forEach(btn => {
+    btn.addEventListener('click', function(e) {
+        e.preventDefault();
+        const target = this.dataset.tab;
+        // 移除所有激活类
         tabBtns.forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        const target = btn.dataset.tab;
-        tabPanes.forEach(pane => {
-            if (pane.id === target) {
-                pane.classList.add('active');
-            } else {
-                pane.classList.remove('active');
-            }
-        });
+        tabPanes.forEach(p => p.classList.remove('active'));
+        // 激活当前
+        this.classList.add('active');
+        document.getElementById(target).classList.add('active');
+        // 保存到 sessionStorage
         sessionStorage.setItem('activeTab', target);
 
+        // 如果是图片页，重新布局
+        if (target === 'photos') {
+            setTimeout(() => {
+                if (window.innerWidth < 768) {
+                    document.querySelectorAll('.card').forEach(card => {
+                        const imgs = card.querySelectorAll('.card-images img');
+                        if (imgs.length > 2) {
+                            for (let i = 2; i < imgs.length; i++) imgs[i].style.display = 'none';
+                        }
+                    });
+                } else {
+                    if (masonryInstance) masonryInstance.layout();
+                    else initMasonry();
+                }
+            }, 100);
+        }
+
+// 恢复上次保存的标签页（如果有）
+const savedTab = sessionStorage.getItem('activeTab');
+if (savedTab) {
+    const btn = document.querySelector(`.tab-btn[data-tab="${savedTab}"]`);
+    if (btn) btn.click();
+}
         // ---------- 新增：切换到图片页时重新布局 ----------
         if (target === 'photos') {
             setTimeout(() => {
