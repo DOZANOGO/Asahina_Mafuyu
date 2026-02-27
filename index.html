@@ -1,0 +1,2066 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="js/masonry.js"></script>
+    <script src="js/imagesloaded.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/masonry-layout@4.2.2/dist/masonry.pkgd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/imagesloaded@5.0.0/imagesloaded.pkgd.min.js"></script>
+    <title>朝比奈真冬</title>
+    <style>
+        /* ---------- 全局样式 ---------- */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', Roboto, system-ui, sans-serif;
+            background: #f5f7fa;
+            color: #1e2b3a;
+            line-height: 1.6;
+        }
+        header {
+            background: linear-gradient(145deg, #894399, #8888cc);
+            color: white;
+            padding: 2rem 2rem;
+            text-align: center;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+        }
+        header h1 {
+            font-size: 2.5rem;
+            letter-spacing: 2px;
+        }
+
+        /* ---------- 标签导航 ---------- */
+        .tabs {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin: 2rem 0 0.5rem;
+            flex-wrap: wrap;
+        }
+        .tab-btn {
+            background: #eef2f6;
+            border: none;
+            padding: 12px 32px;
+            font-size: 1.2rem;
+            font-weight: 600;
+            border-radius: 40px;
+            cursor: pointer;
+            transition: all 0.2s;
+            color: #2c3e50;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            border: 1px solid #d0ddee;
+        }
+        .tab-btn.active {
+            background: #8888cc;
+            color: white;
+            border-color: #1e2a36;
+            box-shadow: 0 6px 10px rgba(0,0,0,0.1);
+        }
+        .tab-btn:hover {
+            background: #d0ddee;
+        }
+
+        /* ---------- 标签内容容器 ---------- */
+        .tab-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 1rem;
+        }
+        .tab-pane {
+            display: none;
+        }
+        .tab-pane.active {
+            display: block;
+        }
+
+        /* ---------- 图片库卡片样式 ---------- */
+        .gallery {
+            display: block;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .card {
+            background: white;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.08);
+            transition: transform 0.2s ease, box-shadow 0.2s;
+            border: 1px solid #eef2f6;
+            display: flex;
+            flex-direction: column;
+            width: 300px;  /* 固定宽度，与 Masonry 的 columnWidth 一致 */
+            margin-bottom: 1.5rem; /* Masonry 的 gutter 会处理间距，这个作为后备 */
+        }
+        .card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 30px rgba(0,0,0,0.15);
+        }
+        .card-images {
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+        }
+        .card-images img {
+            width: 100%;
+            height: 160px;
+            object-fit: cover;
+            display: block;
+            cursor: pointer;
+            transition: opacity 0.2s;
+            border-bottom: 2px solid #fff;
+        }
+        .card-images img:last-child {
+            border-bottom: none;
+        }
+        .card-images img:hover {
+            opacity: 0.9;
+        }
+        .card-content {
+            padding: 1.2rem 1rem 1.5rem;
+        }
+        .card-title {
+            font-size: 1.4rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: #1e2b3a;
+        }
+        .card-desc {
+            color: #5a6b7a;
+            font-size: 0.95rem;
+        }
+        .search-bar {
+           margin-bottom: 1.5rem;
+           text-align: center;
+        }
+        #cardSearch {
+           width: 100%;
+           max-width: 400px;
+           padding: 12px 20px;
+           border: 2px solid #ddd;
+           border-radius: 30px;
+           font-size: 1rem;
+           outline: none;
+           transition: border-color 0.2s;
+        }
+        #cardSearch:focus {
+           border-color: #8888cc;
+        }
+
+        /* ---------- 模态框图片描述 ---------- */
+        .modal-image-caption {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: white;
+            background: rgba(0, 0, 0, 0.7);
+            padding: 10px 20px;
+            border-radius: 30px;
+            margin-top: 15px;
+            font-size: 1.2rem;
+            max-width: 80%;
+        }
+        .caption-icon {
+            width: 24px;
+            height: 24px;
+            object-fit: contain;
+        }
+
+        /* ---------- 手机端图片集网格 ---------- */
+        .modal-grid {
+            width: 90%;
+            max-width: 600px;
+            max-height: 80vh;
+            overflow-y: auto;
+            background: white;
+            border-radius: 20px;
+            padding: 1rem;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.5);
+        }
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            gap: 0.8rem;
+        }
+        .grid-item {
+            cursor: pointer;
+            border-radius: 12px;
+            overflow: hidden;
+            aspect-ratio: 1 / 1;
+            background: #f0f0f0;
+        }
+        .grid-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        /* ---------- 可折叠分类列表样式 ---------- */
+        .category-item {
+            margin-bottom: 1rem;
+            border-radius: 12px;
+            overflow: hidden;
+            background: #f8fafc;
+            border: 1px solid #e0e9f5;
+        }
+        .category-header {
+            background: #e0e9f5;
+            padding: 0.8rem 1.2rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 600;
+            color: #1e2b3a;
+            border-radius: 12px;
+            transition: background 0.2s;
+        }
+        .category-header:hover {
+            background: #d0ddee;
+        }
+        .collapse-icon {
+            font-size: 1.2rem;
+            width: 20px;
+            text-align: center;
+        }
+        .song-list {
+            padding: 0.5rem 0;
+        }
+        .playlist-item {
+            display: flex;
+            align-items: center;
+            padding: 0.8rem 1rem 0.8rem 2.5rem;
+            cursor: pointer;
+            transition: background 0.2s;
+            margin-bottom: 0.3rem;
+        }
+        .playlist-item:hover {
+            background: #f0f4f9;
+        }
+        .playlist-item.active {
+            background: #e0e9f5;
+            font-weight: 600;
+            color: #2980b9;
+        }
+        .playlist-item .track-number {
+            width: 30px;
+            color: #95a5a6;
+            font-size: 0.9rem;
+        }
+        .playlist-item .track-info {
+            flex: 1;
+        }
+        .playlist-item .track-title {
+            font-size: 1.1rem;
+        }
+        .playlist-item .track-artist {
+            font-size: 0.9rem;
+            color: #7f8c8d;
+        }
+        .playlist-item .track-duration {
+            color: #95a5a6;
+            font-size: 0.9rem;
+            margin-left: 1rem;
+        }
+
+        /* ---------- 文章列表卡片样式 ---------- */
+        .article-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 1.5rem;
+        }
+        .article-card {
+            background: white;
+            border-radius: 20px;
+            padding: 1.5rem;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.08);
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            border: 1px solid #eef2f6;
+        }
+        .article-card:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 15px 25px rgba(0,0,0,0.15);
+        }
+        .article-card h3 {
+            font-size: 1.5rem;
+            margin-bottom: 0.8rem;
+            color: #1e2b3a;
+        }
+        .article-card .meta {
+            color: #7f8c8d;
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+            border-bottom: 1px dashed #ddd;
+            padding-bottom: 0.5rem;
+        }
+        .article-card .excerpt {
+            color: #34495e;
+            margin-bottom: 1rem;
+            line-height: 1.5;
+        }
+        .article-card .read-more {
+            color: #3498db;
+            font-weight: 600;
+            font-size: 0.95rem;
+        }
+
+        /* ---------- 音乐播放器页面样式 ---------- */
+        .music-player-container {
+            background: white;
+            border-radius: 30px;
+            padding: 2rem;
+            box-shadow: 0 20px 30px rgba(0,0,0,0.1);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        .now-playing {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        .song-title {
+            font-size: 1.8rem;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+        .song-artist {
+            font-size: 1.2rem;
+            color: #7f8c8d;
+            margin-top: 0.3rem;
+        }
+        .player-controls {
+            display: flex;
+            justify-content: center;
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+        .control-btn {
+            background: #ecf0f1;
+            border: none;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            font-size: 1.8rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+            box-shadow: 0 5px 10px rgba(0,0,0,0.1);
+            color: #2c3e50;
+        }
+        .control-btn:hover {
+            background: #d0ddee;
+            transform: scale(1.05);
+        }
+        .control-btn.play-ee {
+            background: #2c3e50;
+            color: white;
+            width: 70px;
+            height: 70px;
+            font-size: 2rem;
+        }
+        .control-btn.play-pause:hover {
+            background: #1e2a36;
+        }
+        .progress-container {
+            margin: 1.5rem 0;
+        }
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #ecf0f1;
+            border-radius: 10px;
+            cursor: pointer;
+            position: relative;
+        }
+        .progress-fill {
+            height: 100%;
+            width: 0%;
+            background: #3498db;
+            border-radius: 10px;
+            transition: width 0.1s;
+        }
+        .time-info {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 0.5rem;
+            color: #7f8c8d;
+            font-size: 0.9rem;
+        }
+        .playlistData {
+            margin-top: 2rem;
+            border-top: 2px solid #ecf0f1;
+            padding-top: 1.5rem;
+        }
+        .playlistData h3 {
+            margin-bottom: 1rem;
+            color: #2c3e50;
+        }
+        .playlistData-item {
+            display: flex;
+            align-items: center;
+            padding: 0.8rem 1rem;
+            border-radius: 30px;
+            cursor: pointer;
+            transition: background 0.2s;
+            margin-bottom: 0.3rem;
+        }
+        .playlistData-item:hover {
+            background: #f0f4f9;
+        }
+        .playlistData-item.active {
+            background: #e0e9f5;
+            font-weight: 600;
+            color: #2980b9;
+        }
+        .playlistData-item .track-number {
+            width: 30px;
+            color: #95a5a6;
+            font-size: 0.9rem;
+        }
+        .playlistData-item .track-info {
+            flex: 1;
+        }
+        .playlistData-item .track-title {
+            font-size: 1.1rem;
+        }
+        .playlistData-item .track-artist {
+            font-size: 0.9rem;
+            color: #7f8c8d;
+        }
+        .playlistData-item .track-duration {
+            color: #95a5a6;
+            font-size: 0.9rem;
+            margin-left: 1rem;
+        }
+
+        /* ---------- 模态框 ---------- */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 9999;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.9);
+            backdrop-filter: blur(5px);
+            align-items: center;
+            justify-content: center;
+        }
+        .modal.active {
+            display: flex;
+        }
+        .modal-content {
+            max-width: 90%;
+            max-height: 80%;
+            object-fit: contain;
+            border-radius: 8px;
+            border: 3px solid white;
+        }
+        .modal-article {
+            background: white;
+            width: 90%;
+            max-width: 700px;
+            max-height: 85vh;
+            border-radius: 24px;
+            padding: 2rem;
+            overflow-y: auto;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.5);
+            position: relative;
+        }
+        .modal-article h2 {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+            color: #1e2b3a;
+        }
+        .modal-article .date {
+            color: #7f8c8d;
+            margin-bottom: 1.5rem;
+            font-size: 0.95rem;
+        }
+        .modal-article .content {
+            line-height: 1.8;
+            color: #2c3e50;
+            margin-bottom: 2rem;
+            white-space: pre-line;
+        }
+        .comments-section {
+            border-top: 2px solid #ecf0f1;
+            padding-top: 1.5rem;
+            margin-top: 1rem;
+        }
+        .comments-section h3 {
+            margin-bottom: 1.2rem;
+            color: #2c3e50;
+        }
+        .delete-comment {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 1.1rem;
+            opacity: 0.6;
+            transition: opacity 0.2s;
+            padding: 0 5px;
+        }
+        .delete-comment:hover {
+            opacity: 1;
+        }
+        .comment {
+            background: #f8fafc;
+            border-radius: 16px;
+            padding: 1rem 1.2rem;
+            margin-bottom: 1rem;
+        }
+        .comment .author {
+            font-weight: 600;
+            color: #2c3e50;
+        }
+        .comment .time {
+            font-size: 0.8rem;
+            color: #95a5a6;
+            margin-left: 1rem;
+        }
+        .comment p {
+            margin-top: 0.5rem;
+            color: #34495e;
+        }
+        .comment-form {
+            display: flex;
+            flex-direction: column;
+            gap: 0.8rem;
+            margin-top: 1.5rem;
+        }
+        .comment-form input, 
+        .comment-form textarea {
+            padding: 12px 16px;
+            border: 1px solid #d0ddee;
+            border-radius: 30px;
+            font-size: 1rem;
+            font-family: inherit;
+            outline: none;
+            transition: 0.2s;
+        }
+        .comment-form input:focus, 
+        .comment-form textarea:focus {
+            border-color: #3498db;
+            box-shadow: 0 0 0 3px rgba(52,152,219,0.2);
+        }
+        .comment-form textarea {
+            border-radius: 20px;
+            resize: vertical;
+        }
+        .comment-form button {
+            background: #2c3e50;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 40px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.2s;
+            align-self: flex-start;
+        }
+        .comment-form button:hover {
+            background: #1e2a36;
+        }
+        .close-btn {
+            position: absolute;
+            top: 20px;
+            right: 25px;
+            color: white;
+            font-size: 40px;
+            font-weight: bold;
+            cursor: pointer;
+            width: 50px;
+            height: 50px;
+            line-height: 50px;
+            text-align: center;
+            background: rgba(0,0,0,0.5);
+            border-radius: 50%;
+            border: 2px solid white;
+            z-index: 10000;
+        }
+        .close-btn.dark {
+            background: rgba(0,0,0,0.2);
+            color: #333;
+            border-color: #aaa;
+        }
+
+        /* ---------- 百科页面样式 ---------- */
+        .wiki-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 1rem;
+        }
+        .wiki-infobox {
+            flex: 1 1 300px;
+            background: white;
+            border-radius: 20px;
+            padding: 1.5rem;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.08);
+            border: 1px solid #eef2f6;
+            align-self: start;
+        }
+        .wiki-title {
+            font-size: 1.8rem;
+            font-weight: 600;
+            text-align: center;
+            margin-bottom: 1rem;
+            color: #1e2b3a;
+        }
+        .wiki-image {
+            text-align: center;
+            margin-bottom: 1rem;
+        }
+        .wiki-image img {
+            max-width: 100%;
+            max-height: 250px;
+            border-radius: 12px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        .wiki-info {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.95rem;
+        }
+        .wiki-info th {
+            text-align: left;
+            padding: 0.5rem 0.5rem 0.5rem 0;
+            font-weight: 600;
+            color: #2c3e50;
+            width: 35%;
+        }
+        .wiki-info td {
+            padding: 0.5rem 0;
+            color: #34495e;
+        }
+        .wiki-info tr {
+            border-bottom: 1px solid #ecf0f1;
+        }
+        .wiki-info tr:last-child {
+            border-bottom: none;
+        }
+        .wiki-content {
+            flex: 2 1 500px;
+            background: white;
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.08);
+            border: 1px solid #eef2f6;
+        }
+        .wiki-content h2 {
+            font-size: 1.8rem;
+            margin: 1.5rem 0 1rem;
+            color: #1e2b3a;
+            border-bottom: 2px solid #8888cc;
+            padding-bottom: 0.3rem;
+        }
+        .wiki-content h2:first-of-type {
+            margin-top: 0;
+        }
+        .wiki-content h3 {
+            font-size: 1.3rem;
+            margin: 1.2rem 0 0.5rem;
+            color: #2c3e50;
+        }
+        .wiki-content p {
+            margin-bottom: 1rem;
+            line-height: 1.7;
+            color: #34495e;
+        }
+        .wiki-content ul {
+            margin-left: 1.5rem;
+            margin-bottom: 1rem;
+            color: #34495e;
+        }
+        .wiki-content li {
+            margin-bottom: 0.3rem;
+        }
+        .wiki-content a {
+            color: #8888cc;
+            text-decoration: none;
+        }
+        .wiki-content a:hover {
+            text-decoration: underline;
+        }
+        .wiki-content a:visited {
+            color: #0b0080;
+        }
+
+        /* ---------- 移动端适配 ---------- */
+        @media (max-width: 768px) {
+            .wiki-container {
+                flex-direction: column;
+            }
+            .wiki-infobox {
+                width: 100%;
+            }
+        }
+
+        footer {
+            text-align: center;
+            padding: 2rem;
+            color: #5f7a8c;
+            border-top: 1px solid #dbe4eb;
+            margin-top: 3rem;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>欢迎访问该网站！感谢浏览，希望能对你有帮助～</h1>
+    </header>
+
+    <!-- 标签导航 -->
+    <div class="tabs">
+        <button class="tab-btn" data-tab="wiki">介绍页</button>
+        <button class="tab-btn active" data-tab="photos">相关图片</button>
+        <button class="tab-btn" data-tab="articles">剧情</button>
+        <button class="tab-btn" data-tab="music">相关曲目</button>
+    </div>
+
+      <!-- 百科标签页 -->
+<div id="wiki" class="tab-content tab-pane">
+    <div class="wiki-container">
+        <!-- 左侧/上方信息卡片 -->
+        <div class="wiki-infobox">
+            <div class="wiki-title">朝比奈 まふゆ</div>
+            <div class="wiki-image">
+                <img src="images/mfy.png" alt="朝比奈真冬" onerror="this.src='https://via.placeholder.com/200x200?text=No+Image'">
+            </div>
+            <table class="wiki-info">
+                <tr><th>日文名</th><td>朝比奈 まふゆ</td></tr>
+                <tr><th>罗马音</th><td>Asahina Mafuyu</td></tr>
+                <tr><th>别号</th><td>Yuki（雪）、OWN、mfy、马马、马振东、马忽悠、紫色爱笑老奶奶、朝比奈学姐、“无人世界”群主、</td></tr>
+                <tr><th>年龄</th><td>17岁</td></tr>
+                <tr><th>生日</th><td>1月27日</td></tr>
+                <tr><th>星座</th><td>水瓶座</td></tr>
+                <tr><th>身高</th><td>162cm</td></tr>
+                <tr><th>学校</th><td>宫益坂女子学园</td></tr>
+                <tr><th>学年</th><td>高中3年级（4周年后）</td></tr>
+                <tr><th>班级</th><td>B组</td></tr>
+                <tr><th>所属</th><td>25时、Nightcord见。</td></tr>
+                <tr><th>代表色</th><td style="background:#8888cc; color:black;">#8888cc</td></tr>
+            </table>
+        </div>
+
+        <!-- 右侧/下方详细内容 -->
+        <div class="wiki-content">
+            <h2>关于真冬</h2>
+            <p>朝比奈真冬是《世界计划：缤纷舞台 feat：初音未来》中25时、Nightcord见。的成员之一。宫益坂女子学园的三年级生，在25点，Nightcord见。主要负责作词和混音，偶尔会参与作曲。奏听过真冬以前写过的歌后向真冬发出邀请，真冬也受邀加入25时。聪明又幽默，是一个值得任何人信任的优等生……<br>
+            表面上像是完美的优等生…？</p>
+
+            <h2>性格</h2>
+            <p>表面冷静、礼貌，但情感淡漠，很少表露情绪。实际上非常迷茫，不知道自己真正想要什么。与家人（尤其是母亲）关系复杂，长期承受母亲期望的压力。</p>
+
+            <h2>代表物</h2>
+            <h3>苹果</h3>
+            <p>在最早的 灯のミラージュ （mfy2箱）中朝比奈真冬回想起了小时候生病妈妈会切苹果给她吃，真冬还要求妈妈切成小兔子形状的。<br>
+            （当期卡面有关于白雪公主和苹果，白雪公主是真冬小时候在幼稚园表演时候扮演的角色，同时真冬妈妈在卡面里的角色是皇后）；
+            <li>在灯を手繰りよせて （真冬5箱）卡面花后手中的苹果；
+            <li>在 水底に影を探して （25w1）中从代表内心的湖中捞出了苹果，感到温暖。
+            <li>在 泡沫に抱かれて （25wl2）中的卡面特训后以及服装上也有苹果元素
+            <br>（卡面底部有一个抱着苹果的兔子玩偶，衣服腿部镂空金属是苹果形状）</p>
+            <h3>兔子</h3>
+            <p>真冬一直都有兔子塑，同时真冬也具有很多兔子的性格特征。例如比较能忍痛，不去特别注意观察是看不出来她的异常的。<li>おばけなバケーション！ （试胆大会）的卡面花后以及双马尾发型（垂耳兔）；<li>探寻我的内心深处（cfes）卡面花后的服装和手里拿的故事书上黑白异色的兔子饰品和图案（故事书是小时候的）；<li>灯のミラージュ （mfy2箱）卡面花前小真冬抱着的，灯を手繰りよせて （mfy5箱）卡面花前放在枕边的灰色兔子玩偶；<li>泡沫に抱かれて （25wl2）卡面花后的紫色兔子玩偶，以及官方周边的兔子元素等。</p>
+            <h3>其他代表物</h3>
+            <ul>
+                <li><strong>雪</strong><li>真冬的网名是YUKI，是日语ユキ（雪），她的头像也是雪花标志<br>
+                （虽然有可能是随便起的名字和换的头像）。
+                <li><strong>龙</strong><li>在有一次真冬和奏聊天时，奏分享了穗波的心理测试题，真冬第一个想到的生物是龙。
+                <li>在 ともに、トウノレーノレート目指して （VR混）的幻想生物以及服装元素（角和尾巴）
+                <li><strong>人偶和面具</strong><li>囚われのマリオネット （mfy1箱）以人偶为主题
+                <li>仮面の私にさよならを 卡面花后的破碎异色面具以及若隐若现的丝线
+                <li>《演劇》里的提线人偶
+                <li>灯を手繰りよせて （mfy5箱）花后在鱼缸中浸泡的面具等等。<br>
+                如有更多欢迎补充～
+            </ul>
+
+            <h2>对其他人的印象</h2>
+            <ul>
+                <li><strong>宵崎奏：</strong>一起制作歌曲的同伴。最初听到奏的歌曲的时候“仿佛被拯救了一样”，于是和奏继续合作下去。如今在奏承诺有一天会作出拯救真冬的曲子后，表示会一直等她，并感谢奏能够找到她。
+                <li><strong>晓山瑞希：</strong>一起创作歌曲的同伴，对可爱的执着比常人多一倍。在真冬迷茫时提议她“逃避“这一方法。
+                <li><strong>东云绘名：</strong>一起制作歌曲的同伴。优等生模式下认可绘名的作品。真面目模式下虽然经常吐槽绘名的画，惹得绘名生气，但也承认绘名对画画抱有的热情。
+                <li><strong>星乃一歌：</strong>同样是班级委员的后辈。很直率，对乐队活动全力以赴。（曾在最后一张CD事件中帮一歌与奏搭桥认识）
+                <li><strong>望月穗波：</strong>在奏家帮忙做家政的人。同校的后辈。和一歌一起在做乐队。在自己来到奏家居住后，不得已让她知晓了自己的真实一面
+                <li><strong>日野森雫：</strong>同级生，在做偶像。同属弓道部。在社团里遇到时会说说话。二人关系不错。修学旅行（百鬼）时也一起行动。
+                <li><strong>东云彰人：</strong>绘名的弟弟，和其他人一起组队唱歌。在一次25时与VBS偶遇时经介绍认识。之后也曾在东云家留宿时一起吃过晚饭。
+                <li><strong>凤笑梦：</strong>后辈。在宫女体育节时认识。明明什么也没做却很怕我。明明很怕我却又想让我笑出来。搞不太明白的孩子。
+            </ul>
+
+            <h2>人尽皆知的热知识（？）</h2>
+            <ul>
+            <li>mfy的网名是雪(因为当时取名字的时候窗外在下雪
+            <li>对外声称喜欢吃的是妈妈烧的菜
+            <li>能看见鬼但不害怕(来自瑞希一箱二星卡的剧情
+            <li>没味觉，曾因没味觉误食过期食品
+            <li>是25时唯一一个按常理来说正常上学的
+            <li>握力有60kg(大概能徒手捏爆一个苹果
+            <li>爱好是盯着鱼缸看(但是里面没有鱼
+            <li>真冬在开心的时候刘海会分叉，阴暗的时候是厚刘海
+            <li>学习很好担任年级的学习委员
+            <li>擅长英语对话，被老师夸过是出国都没问题的水平
+            <li>营业时的假笑被emu识破过也吓到过她
+            <li>运气很好饮料再来一瓶之类的总能轻易抽中
+            <li>体力很好，就算是提着两桶水上楼也不会气喘吁吁
+            <li>不擅长表达自己的情绪
+            <li>真冬好像每次说话都会顿一下
+            <li>射箭几乎从来没有偏过
+            <li>对 emu的感受是:明明什么也没做却很害怕我很怕我却又想让我笑出来搞不太明白的孩子
+            <li>涩谷节时曾帮类处理伤口
+            <li>吃奏给的即食咖喱第一次隐约尝到一点点的辣味
+            <li>会弹钢琴
+            <li>手机隐藏相册文件夹叫“-_-”全是拍天空的照片，用来“确认今天颜色”
+            <li>听从奏的意见买了海草放进鱼缸，有时会盯着鱼缸里乱晃的海草
+            <li>穗波目前是25时以外目前唯一知晓真冬真实一面的角色(真冬来到奏家居住后，不得已让她知晓了自己的真实的一面
+            <li>觉得彰人看起来比绘名可靠
+            <li>真冬对类的演出有一定的滤镜，当别人都在吐槽时，真冬却一直在说好话，甚至在非营业状态下全程保持微笑
+            </ul>
+        </div>
+    </div>
+</div>
+
+    <!-- 图片库标签页 -->
+    <div id="photos" class="tab-content tab-pane active">
+    <div class="search-bar">
+    <input type="text" id="cardSearch" placeholder="搜索卡片...">
+</div>
+        <div class="gallery" id="gallery">
+            <!-- 卡片 1 -->
+            <div class="card">
+                <div class="card-images">
+                    <img src="images/87.png" loading="lazy" data-img="images/87.png" data-title="被当做“好孩子”的优等生" data-icon="images/1.png" alt="初始卡">
+                </div>
+                <div class="card-content">
+                    <div class="card-title">初始卡面</div>
+                    <div class="card-desc">营业微笑</div>
+                </div>
+            </div>
+            <!-- 卡片 2 -->
+            <div class="card">
+                <div class="card-images">
+                    <img src="images/84.png" loading="lazy" data-img="images/84.png" data-title="25时，nightcord见。" data-icon="images/2.png" alt="旧队服">
+                    <img src="images/20.png" loading="lazy" data-img="images/20.png" data-title="Band new style" data-icon="images/2.png" alt="新队服">
+                </div>
+                <div class="card-content">
+                    <div class="card-title">新旧队服</div>
+                    <div class="card-desc">温良学姐黑脸中</div>
+                </div>
+            </div>
+            <!-- 卡片 3 -->
+            <div class="card">
+                <div class="card-images">
+                    <img src="images/83.png" loading="lazy" data-img="images/83.png" data-title="废弃校舍的邂逅" data-icon="images/2.png" alt="mzk1箱">
+                    <img src="images/82.png" loading="lazy" data-img="images/82.png" data-title="抬头看到的月亮是同一个" data-icon="images/2.png" alt="月兔混">
+                    <img src="images/81.png" loading="lazy" data-img="images/81.png" data-title="引导之杖" data-icon="images/2.png" alt="隐者马（mzk2箱）">
+                    <img src="images/80.png" loading="lazy" data-img="images/80.png" data-title="无法压抑的心意" data-icon="images/2.png" alt="萨姆沙（knd3箱）">
+                    <img src="images/86.png" loading="lazy" data-img="images/86.png" data-title="feat：小麦粉精灵" data-icon="images/2.png" alt="三丽鸥">
+                    <img src="images/79.png" loading="lazy" data-img="images/79.png" data-title="所待之人尚远" data-icon="images/2.png" alt="余花">
+                    <img src="images/85.png" loading="lazy" data-img="images/85.png" data-title=" Let's enjoy the movie！" data-icon="images/2.png" alt="电影">
+                    <img src="images/78.png" loading="lazy" data-img="images/78.png" data-title="挑选回礼" data-icon="images/2.png" alt="糖5">
+                    <img src="images/77.png" loading="lazy" data-img="images/77.png" data-title="担心你彻夜未眠" data-icon="images/2.png" alt="画6">
+                    <img src="images/76.png" loading="lazy" data-img="images/76.png" data-title="仅仅是默默守护着" data-icon="images/2.png" alt="奏6">
+                    <div class="card-title">其他二星</div>
+                    <div class="card-desc">多图卡片，点击查看全部</div>
+                </div>
+            </div>
+            <!-- 卡片 4 -->
+            <div class="card">
+                <div class="card-images">
+                    <img src="images/75.png" loading="lazy" data-img="images/75.png" data-title="我是“好孩子”_花前" data-icon="images/4.png" alt="无人世界1">
+                    <img src="images/74.png" loading="lazy" data-img="images/74.png" data-title="我是“好孩子”_花后" data-icon="images/4.png" alt="无人世界2">
+                </div>
+                <div class="card-content">
+                    <div class="card-title">我是“好孩子”</div>
+                    <div class="card-desc">主线三星</div>
+                </div>
+            </div>
+            <!-- 卡片 5 -->
+            <div class="card">
+                <div class="card-images">
+                    <img src="images/45.png" loading="lazy" data-img="images/45.png" data-title="拘束的化装舞会_花前" data-icon="images/3.png" alt="人偶花前关键剧情">
+                    <img src="images/44.png" loading="lazy" data-img="images/44.png" data-title="拘束的化装舞会_花后" data-icon="images/3.png" alt="人偶花后常驻四星">
+                </div>
+                <div class="card-content">
+                    <div class="card-title">拘束的化妆舞会</div>
+                    <div class="card-desc">人偶（mfy1箱）</div>
+                </div>
+            </div>
+            <!-- 卡片 6 -->
+            <div class="card">
+                <div class="card-images">
+                    <img src="images/73.png" loading="lazy" data-img="images/73.png" data-title="欢快的两人三足？_花前" data-icon="images/4.png" alt="运动混三星">
+                    <img src="images/72.png" loading="lazy" data-img="images/72.png" data-title="欢快的两人三足？_花后" data-icon="images/4.png" alt="运动混三星">
+                </div>
+                <div class="card-content">
+                    <div class="card-title">欢快的两人三足？</div>
+                    <div class="card-desc">运动混</div>
+                </div>
+            </div>
+            <!-- 卡片 7 -->
+            <div class="card">
+                <div class="card-images">
+                    <img src="images/43.png" loading="lazy" data-img="images/43.png" data-title="向你抛出的言语_花前" data-icon="images/3.png" alt="画ena1四星">
+                    <img src="images/42.png" loading="lazy" data-img="images/42.png" data-title="向你抛出的言语_花后" data-icon="images/3.png" alt="画常驻">
+                </div>
+                <div class="card-content">
+                    <div class="card-title">向你抛出的言语</div>
+                    <div class="card-desc">无限灰</div>
+                </div>
+            </div>
+            <!-- 卡片 8 -->
+            <div class="card">
+                <div class="card-images">
+                    <img src="images/19.png" loading="lazy" data-img="images/19.png" data-title="探寻我的内心深处_花前" data-icon="images/3.png" alt="cfes花前">
+                    <img src="images/61.png" loading="lazy" data-img="images/61.png" data-title="探寻我的内心深处_花后" data-icon="images/3.png" alt="cfes花后四星">
+                </div>
+                <div class="card-content">
+                    <div class="card-title">探寻我的内心深处</div>
+                    <div class="card-desc">图书馆（cfes限定）</div>
+                </div>
+            </div>
+            <!-- 卡片 9 -->
+            <div class="card">
+                <div class="card-images">
+                    <img src="images/41.png" loading="lazy" data-img="images/41.png" data-title="微绽的笑容_花前" data-icon="images/3.png" alt="奏明花前knd1奏">
+                    <img src="images/40.png" loading="lazy" data-img="images/40.png" data-title="微绽的笑容_花后" data-icon="images/3.png" alt="奏明花后常驻四星">
+                </div>
+                <div class="card-content">
+                    <div class="card-title">微绽的笑容</div>
+                    <div class="card-desc">奏明（无服装 假四星）</div>
+                </div>
+            </div>
+            <!-- 卡片 10 -->
+            <div class="card">
+                <div class="card-images">
+                    <img src="images/39.png" loading="lazy" data-img="images/39.png" data-title="温暖与爱的记忆_花前" data-icon="images/3.png" alt="苹果花前关键剧情">
+                    <img src="images/38.png" loading="lazy" data-img="images/38.png" data-title="温暖与爱的记忆_花后" data-icon="images/3.png" alt="苹果花后常驻四星">
+                </div>
+                <div class="card-content">
+                    <div class="card-title">温暖与爱的记忆</div>
+                    <div class="card-desc">苹果（mfy2箱）</div>
+                </div>
+            </div>
+            <!-- 卡片 11 -->
+            <div class="card">
+                <div class="card-images">
+                    <img src="images/60.png" loading="lazy" data-img="images/60.png" data-title="在初雪中_花前" data-icon="images/3.png" alt="初雪花前">
+                    <img src="images/59.png" loading="lazy" data-img="images/59.png" data-title="在初雪中_花后" data-icon="images/3.png" alt="初雪花后混活四星">
+                </div>
+                <div class="card-content">
+                    <div class="card-title">在初雪中</div>
+                    <div class="card-desc">初雪（限定）</div>
+                </div>
+            </div>
+            <!-- 卡片 12 -->
+            <div class="card">
+                <div class="card-images">
+                    <img src="images/37.png" loading="lazy" data-img="images/37.png" data-title="绝望之底的厄比斯_花前" data-icon="images/3.png" alt="绝望底花前knd2四星">
+                    <img src="images/36.png" loading="lazy" data-img="images/36.png" data-title="绝望之底的厄比斯_花后" data-icon="images/3.png" alt="绝望底花后常驻">
+                </div>
+                <div class="card-content">
+                    <div class="card-title">绝望之底的厄比斯</div>
+                    <div class="card-desc">绝望底</div>
+                </div>
+            </div>
+            <!-- 卡片 13 -->
+            <div class="card">
+                <div class="card-images">
+                    <img src="images/71.png" loading="lazy" data-img="images/71.png" data-title="回想起的色彩_花前" data-icon="images/4.png" alt="流浪者花前三星">
+                    <img src="images/70.png" loading="lazy" data-img="images/70.png" data-title="回想起的色彩_花后" data-icon="images/4.png" alt="流浪者花后ena2画2三星">
+                </div>
+                <div class="card-content">
+                    <div class="card-title">回想起的色彩</div>
+                    <div class="card-desc">流浪者</div>
+                </div>
+            </div>
+            <!-- 卡片 14 -->
+            <div class="card">
+                <div class="card-images">
+                    <img src="images/35.png" loading="lazy" data-img="images/35.png" data-title="在夕阳余温中_花前" data-icon="images/3.png" alt="bug花前关键剧情">
+                    <img src="images/15.png" loading="lazy" data-img="images/15.png" data-title="在夕阳余温中_花后" data-icon="images/3.png" alt="bug花后常驻四星">
+                </div>
+                <div class="card-content">
+                    <div class="card-title">在夕阳余温中</div>
+                    <div class="card-desc">bug（mfy3箱）</div>
+                </div>
+            </div>
+            <!-- 卡片 15 -->
+            <div class="card">
+                <div class="card-images">
+                    <img src="images/34.png" loading="lazy" data-img="images/34.png" data-title="遥远的温度_花前" data-icon="images/3.png" alt="睡衣mzk3糖三">
+                    <img src="images/33.png" loading="lazy" data-img="images/33.png" data-title="遥远的温度_花后" data-icon="images/3.png" alt="睡衣花后常驻四星">
+                </div>
+                <div class="card-content">
+                    <div class="card-title">遥远的温度</div>
+                    <div class="card-desc">睡衣</div>
+                </div>
+            </div>
+            <!-- 卡片 16 -->
+            <div class="card">
+                <div class="card-images">
+                    <img src="images/58.png" loading="lazy" data-img="images/58.png" data-title="温柔的咒语_花前" data-icon="images/3.png" alt="黑百合花前">
+                    <img src="images/57.png" loading="lazy" data-img="images/57.png" data-title="温柔的咒语_花后" data-icon="images/3.png" alt="黑百合花后混活四星">
+                </div>
+                <div class="card-content">
+                    <div class="card-title">温柔的咒语</div>
+                    <div class="card-desc">黑百合（限定）</div>
+                </div>
+            </div>
+            <!-- 卡片 17 -->
+            <div class="card">
+                <div class="card-images">
+                    <img src="images/32.png" loading="lazy" data-img="images/32.png" data-title="气氛略异的餐桌_花前" data-icon="images/3.png" alt="原宿花前ena3">
+                    <img src="images/14.png" loading="lazy" data-img="images/14.png" data-title="气氛略异的餐桌_花后" data-icon="images/3.png" alt="原宿花后常驻四星">
+                </div>
+                <div class="card-content">
+                    <div class="card-title">气氛略异的餐桌</div>
+                    <div class="card-desc">原宿</div>
+                </div>
+            </div>
+            <!-- 卡片 18 -->
+            <div class="card">
+                <div class="card-images">
+                    <img src="images/31.png" loading="lazy" data-img="images/31png" data-title="只有你知道的寂静_花前" data-icon="images/3.png" alt="弓道花前常驻">
+                    <img src="images/30.png" loading="lazy" data-img="images/30.png" data-title="只有你知道的寂静_花后" data-icon="images/3.png" alt="弓道花后混活四星">
+                </div>
+                <div class="card-content">
+                    <div class="card-title">只有你知道的寂静</div>
+                    <div class="card-desc">弓道</div>
+                </div>
+            </div>
+            <!-- 卡片 19 -->
+            <div class="card">
+                <div class="card-images">
+                    <img src="images/18.png" loading="lazy" data-img="images/18.png" data-title="逐渐被断绝的路_花前" data-icon="images/3.png" alt="kitty花前四星">
+                    <img src="images/56.png" loading="lazy" data-img="images/56.png" data-title="逐渐被断绝的路_花后" data-icon="images/3.png" alt="kitty花后mzk4糖">
+                </div>
+                <div class="card-content">
+                    <div class="card-title">逐渐被断绝的路</div>
+                    <div class="card-desc">kitty（限定）</div>
+                </div>
+            </div>
+            <!-- 卡片 20 -->
+            <div class="card">
+                <div class="card-images">
+                    <img src="images/69.png" loading="lazy" data-img="images/69.png" data-title="休息时间_花前" data-icon="images/4.png" alt="百鬼花前">
+                    <img src="images/68.png" loading="lazy" data-img="images/68.png" data-title="休息时间_花后" data-icon="images/4.png" alt="百鬼花后混活三星">
+                </div>
+                <div class="card-content">
+                    <div class="card-title">休息时间</div>
+                    <div class="card-desc">百鬼</div>
+                </div>
+            </div>
+            <!-- 卡片 21 -->
+            <div class="card">
+                <div class="card-images">
+                    <img src="images/29.png" loading="lazy" data-img="images/29.png" data-title="真正的想法_花前" data-icon="images/3.png" alt="演剧花前关键剧情">
+                    <img src="images/28.png" loading="lazy" data-img="images/28.png" data-title="真正的想法_花后" data-icon="images/3.png" alt="演剧花后常驻四星">
+                </div>
+                <div class="card-content">
+                    <div class="card-title">真正的想法</div>
+                    <div class="card-desc">演剧（mfy4箱）</div>
+                </div>
+            </div>
+            <!-- 卡片 22 -->
+            <div class="card">
+                <div class="card-images">
+                    <img src="images/55.png" loading="lazy" data-img="images/55.png" data-title="被拾起的“心”_花前" data-icon="images/3.png" alt="wl1四星">
+                    <img src="images/54.png" loading="lazy" data-img="images/54.png" data-title="被拾起的“心”_花后" data-icon="images/3.png" alt="wl限定">
+                </div>
+                <div class="card-content">
+                    <div class="card-title">被拾起的“心”</div>
+                    <div class="card-desc">水底（25wl1）</div>
+                </div>
+            </div>
+            <!-- 卡片 23 -->
+            <div class="card">
+                <div class="card-images">
+                    <img src="images/27.png" loading="lazy" data-img="images/27.png" data-title="吐露的真心_花前" data-icon="images/3.png" alt="knd4四星">
+                    <img src="images/26.png" loading="lazy" data-img="images/26.png" data-title="吐露的真心_花后" data-icon="images/3.png" alt="奏knd4常驻">
+                </div>
+                <div class="card-content">
+                    <div class="card-title">吐露的真心</div>
+                    <div class="card-desc">情热</div>
+                </div>
+            </div>
+            <!-- 卡片 24 -->
+            <div class="card">
+                <div class="card-images">
+                    <img src="images/67.png" loading="lazy" data-img="images/67.png" data-title="前往更远一点的地方_花前" data-icon="images/4.png" alt="新年混活">
+                    <img src="images/66.png" loading="lazy" data-img="images/66.png" data-title="我是“好孩子”_花后" data-icon="images/4.png" alt="新年混三星">
+                </div>
+                <div class="card-content">
+                    <div class="card-title">前往更远一点的地方</div>
+                    <div class="card-desc">新年混</div>
+                </div>
+            </div>
+            <!-- 卡片 25 -->
+            <div class="card">
+                <div class="card-images">
+                    <img src="images/53.png" loading="lazy" data-img="images/53.png" data-title="泡沫中的安宁_花前" data-icon="images/3.png" alt="四星限定白情">
+                    <img src="images/17.png" loading="lazy" data-img="images/17.png" data-title="泡沫中的安宁_花后" data-icon="images/3.png" alt="骑士白情混活">
+                </div>
+                <div class="card-content">
+                    <div class="card-title">泡沫中的安宁</div>
+                    <div class="card-desc">骑士（白情 限定）</div>
+                </div>
+            </div>
+            <!-- 卡片 26 -->
+            <div class="card">
+                <div class="card-images">
+                    <img src="images/13.png" loading="lazy" data-img="images/13.png" data-title="安静地准备_花前" data-icon="images/3.png" alt="ena4常驻">
+                    <img src="images/25.png" loading="lazy" data-img="images/25.png" data-title="安静地准备_花后" data-icon="images/3.png" alt="我是雨四星">
+                </div>
+                <div class="card-content">
+                    <div class="card-title">安静地准备</div>
+                    <div class="card-desc">我是雨</div>
+                </div>
+            </div>
+            <!-- 卡片 27 -->
+            <div class="card">
+                <div class="card-images">
+                    <img src="images/24.png" loading="lazy" data-img="images/24.png" data-title="温暖的手_花前" data-icon="images/3.png" alt="紫化常驻四星">
+                    <img src="images/12.png" loading="lazy" data-img="images/12.png" data-title="温暖的手_花后" data-icon="images/3.png" alt="关键剧情紫化四星">
+                </div>
+                <div class="card-content">
+                    <div class="card-title">温暖的手</div>
+                    <div class="card-desc">紫化（mfy5箱）</div>
+                </div>
+            </div>
+            <!-- 卡片 28 -->
+            <div class="card">
+                <div class="card-images">
+                    <img src="images/65.png" loading="lazy" data-img="images/65.png" data-title="意想不到的双人票_花前" data-icon="images/4.png" alt="水族馆三星">
+                    <img src="images/64.png" loading="lazy" data-img="images/64.png" data-title="意想不到的双人票_花后" data-icon="images/4.png" alt="水族馆混活三星">
+                </div>
+                <div class="card-content">
+                    <div class="card-title">意想不到的双人票</div>
+                    <div class="card-desc">水族馆</div>
+                </div>
+            </div>
+            <!-- 卡片 29 -->
+            <div class="card">
+                <div class="card-images">
+                    <img src="images/52.png" loading="lazy" data-img="images/52.png" data-title="猫耳妖怪的引路人_花前" data-icon="images/3.png" alt="护士混活四星限定">
+                    <img src="images/16.png" loading="lazy" data-img="images/16.png" data-title="猫耳妖怪的引路人_花后" data-icon="images/3.png" alt="护士混活双马尾四星">
+                </div>
+                <div class="card-content">
+                    <div class="card-title">猫耳妖怪的引路人</div>
+                    <div class="card-desc">护士（限定）</div>
+                </div>
+            </div>
+            <!-- 卡片 30 -->
+            <div class="card">
+                <div class="card-images">
+                    <img src="images/63.png" loading="lazy" data-img="images/63.png" data-title="品尝正宗的烤鱿鱼_花前" data-icon="images/4.png" alt="mzk5糖三星">
+                    <img src="images/62.png" loading="lazy" data-img="images/52.png" data-title="品尝正宗的烤鱿鱼_花后" data-icon="images/4.png" alt="mzk5三星">
+                </div>
+                <div class="card-content">
+                    <div class="card-title">品尝正宗的烤鱿鱼</div>
+                    <div class="card-desc">鱿鱼</div>
+                </div>
+            </div>
+            <!-- 卡片 31 -->
+            <div class="card">
+                <div class="card-images">
+                    <img src="images/51.png" loading="lazy" data-img="images/51.png" data-title="在静谧的图书馆中_花前" data-icon="images/3.png" alt="吸血鬼">
+                    <img src="images/50.png" loading="lazy" data-img="images/50.png" data-title="在静谧的图书馆中_花后" data-icon="images/3.png" alt="情人节混活四星限定">
+                </div>
+                <div class="card-content">
+                    <div class="card-title">在静谧的图书馆中</div>
+                    <div class="card-desc">情人节（限定）</div>
+                </div>
+            </div>
+            <!-- 卡片 32 -->
+            <div class="card">
+                <div class="card-images">
+                    <img src="images/23.png" loading="lazy" data-img="images/23.png" data-title="寂静的厨房_花前" data-icon="images/3.png" alt="knd奏常驻">
+                    <img src="images/22.png" loading="lazy" data-img="images/22.png" data-title="寂静的厨房_花后" data-icon="images/3.png" alt="knd5奏四星">
+                </div>
+                <div class="card-content">
+                    <div class="card-title">寂静的厨房</div>
+                    <div class="card-desc">天蛾</div>
+                </div>
+            </div>
+            <!-- 卡片 33 -->
+            <div class="card">
+                <div class="card-images">
+                    <img src="images/49.png" loading="lazy" data-img="images/49.png" data-title="温暖的时光_花前" data-icon="images/3.png" alt="虚无四星关键剧情限定">
+                    <img src="images/48.png" loading="lazy" data-img="images/48.png" data-title="温暖的时光_花后" data-icon="images/3.png" alt="虚无四星">
+                </div>
+                <div class="card-content">
+                    <div class="card-title">温暖的时光</div>
+                    <div class="card-desc">虚无（mfy6箱 限定）</div>
+                </div>
+            </div>
+            <!-- 卡片 34 -->
+            <div class="card">
+                <div class="card-images">
+                    <img src="images/47.png" loading="lazy" data-img="images/47.png" data-title="重叠的笑容_花前" data-icon="images/3.png" alt="wl限定">
+                    <img src="images/46.png" loading="lazy" data-img="images/46.png" data-title="重叠的笑容_花后" data-icon="images/3.png" alt="wl2限定四星">
+                </div>
+                <div class="card-content">
+                    <div class="card-title">重叠的笑容</div>
+                    <div class="card-desc">25wl2（wl2限定）</div>
+                </div>
+            </div>
+            <!-- 卡片 35 -->
+            <div class="card">
+                <div class="card-images">
+                    <img src="images/11.png" loading="lazy" data-img="images/11.png" data-title="拾起的回忆_花前" data-icon="images/3.png" alt="混活VR混混活">
+                    <img src="images/21.png" loading="lazy" data-img="images/21.png" data-title="拾起的回忆_花后" data-icon="images/3.png" alt="常驻四星">
+                </div>
+                <div class="card-content">
+                    <div class="card-title">拾起的回忆</div>
+                    <div class="card-desc">VR混</div>
+                </div>
+            </div>
+            <!-- 卡片 36 -->
+            <div class="card">
+                <div class="card-images">
+                    <img src="images/92.png" loading="lazy" data-img="images/92.png" data-title="Happy Birthday！！" data-icon="images/5.png" alt="2022四星">
+                    <img src="images/91.png" loading="lazy" data-img="images/91.png" data-title="Happy Birthday！！2023" data-icon="images/5.png" alt="2023">
+                    <img src="images/90.png" loading="lazy" data-img="images/90.png" data-title="Happy Birthday！！2024" data-icon="images/5.png" alt="2024">
+                    <img src="images/89.png" loading="lazy" data-img="images/89.png" data-title="Happy Birthday！！2025" data-icon="images/5.png" alt="2025">
+                    <img src="images/88.png" loading="lazy" data-img="images/88.png" data-title="Happy Birthday！！2026" data-icon="images/5.png" alt="2026">
+                </div>
+                <div class="card-content">
+                    <div class="card-title">生日卡</div>
+                    <div class="card-desc">0127 生日限定</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 文章列表标签页（共9篇） -->
+    <div id="articles" class="tab-content tab-pane">
+        <div class="article-list">
+            <!-- 文章卡片 1 -->
+            <div class="article-card" data-article-id="1">
+                <h3>主线</h3>
+                <div class="meta">25時、ナイトコードで。</div>
+                <div class="excerpt">宵崎奏为了创作出「能令人幸福的歌曲」而组成的音乐社团。 简称「25（ニーゴ）」。每日25时（凌晨1点）成员四人准时集合，通过语音交流平台「Nightcord」进行沟通创作。大家虽然不知道对方的长相和真名，但相处得还算融洽。 然而有一天，其中一人突然失联…</div>
+                <div class="read-more">阅读全文 →</div>
+            </div>
+            <!-- 文章卡片 2 -->
+            <div class="article-card" data-article-id="2">
+                <h3>mfy1箱</h3>
+                <div class="meta">举办时间:2020年10月20</div>
+                <div class="excerpt">奏为了兑现和真冬的约定，决定更深入的去了解她，没想到就在社团4个人一起去参观人偶展的时候，真冬身上发生了不寻常的事情….</div>
+                <div class="read-more">阅读全文 →</div>
+            </div>
+            <!-- 文章卡片 3 -->
+            <div class="article-card" data-article-id="3">
+                <h3>mfy2箱</h3>
+                <div class="meta">举办时间:2021年9月21</div>
+                <div class="excerpt">自从那天听了奏的曲子露出笑容后，真冬就一直在思考其中的原因，就在4人一起对此进行讨论时，真冬却突然感到身体不适…</div>
+                <div class="read-more">阅读全文 →</div>
+            </div>
+            <!-- 文章卡片 4 -->
+            <div class="article-card" data-article-id="4">
+                <h3>mfy3箱</h3>
+                <div class="meta">举办时间:2022年6月20</div>
+                <div class="excerpt">学校的模考将近，真冬为了回应母亲的期待，一直在努力学习，这时在瑞希的提议下，25的成员商量起一起去游乐园玩……？</div>
+                <div class="read-more">阅读全文 →</div>
+            </div>
+            <!-- 文章卡片 5 -->
+            <div class="article-card" data-article-id="5">
+                <h3>mfy4箱</h3>
+                <div class="meta">举办时间:2023年7月11</div>
+                <div class="excerpt">真冬的母亲不仅收走了她的电脑，还加强了对她的管制，真冬的精神日渐疲惫，而期末考试的结果也快出来了….</div>
+                <div class="read-more">阅读全文 →</div>
+            </div>
+            <!-- 文章卡片 6 -->
+            <div class="article-card" data-article-id="6">
+                <h3>mfy5箱</h3>
+                <div class="meta">举办时间:2024.6.20</div>
+                <div class="excerpt">自从真冬踏出家门搬到奏的家之后，就一直无法向前迈进，此时父亲想让真冬告诉他“和妈妈谈话那天的具体情况”。本已决定告知事情经过的真冬不知为何又欲言而止…</div>
+                <div class="read-more">阅读全文 →</div>
+            </div>
+            <!-- 文章卡片 7 -->
+            <div class="article-card" data-article-id="7">
+                <h3>mfy6箱</h3>
+                <div class="meta">举办时间:2025年4月30</div>
+                <div class="excerpt">真冬下定决心要对母亲传达自己的心情，真冬的母亲也发誓要比什么都尊重真冬的心情，就这样在谈话的那天，两人久违地面对面，开始谈论彼此的思念……</div>
+                <div class="read-more">阅读全文 →</div>
+            </div>
+            <!-- 文章卡片 8 -->
+            <div class="article-card" data-article-id="8">
+                <h3>25wl1</h3>
+                <div class="meta">举办时间:2023年11月8</div>
+                <div class="excerpt">真冬和奏同居后，4人再次一起在nightcord重新开始活动。在各自思考着今后的道路的时候，在无人世界里面开始发生变化…</div>
+                <div class="read-more">阅读全文 →</div>
+            </div>
+            <!-- 文章卡片 9 -->
+            <div class="article-card" data-article-id="9">
+                <h3>25wl2</h3>
+                <div class="meta">举办时间:2025年6月9</div>
+                <div class="excerpt">在朝比奈家的家庭会议已经过去一段时间的某天，来到SEKAI的奏他们发现了树苗的异样，以此为契机，4人在梦中看到了“与现在截然不同的生活”……</div>
+                <div class="read-more">阅读全文 →</div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- 音乐播放器标签页 -->
+    <div id="music" class="tab-content tab-pane">
+        <div class="music-player-container">
+            <!-- 当前播放信息 -->
+            <div class="now-playing">
+                <div class="song-title" id="currentSongTitle">未播放</div>
+                <div class="song-artist" id="currentSongArtist">-</div>
+            </div>
+            <!-- 控制按钮 -->
+            <div class="player-controls">
+                <button class="control-btn" id="prevBtn" title="上一首">⏮</button>
+                <button class="control-btn play-pause" id="playPauseBtn" title="播放/暂停">▶</button>
+                <button class="control-btn" id="nextBtn" title="下一首">⏭</button>
+            </div>
+            <!-- 进度条 -->
+            <div class="progress-container">
+                <div class="progress-bar" id="progressBar">
+                    <div class="progress-fill" id="progressFill"></div>
+                </div>
+                <div class="time-info">
+                    <span id="currentTime">0:00</span>
+                    <span id="duration">0:00</span>
+                </div>
+            </div>
+            <!-- 播放列表 -->
+            <div class="playlistData">
+                <h3>播放列表</h3>
+                <div id="playlistItems">
+                    <!-- 动态生成 -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 全局模态框 -->
+    <div id="globalModal" class="modal">
+        <span class="close-btn" id="closeModalBtn">&times;</span>
+        <!-- 图片放大内容 -->
+        <img class="modal-content" id="modalImage" src="" alt="" style="display: none;">
+        <!-- 图片描述区域 -->
+        <div class="modal-image-caption" id="modalImageCaption" style="display: none;">
+            <img src="images/icon.png" alt="icon" class="caption-icon">
+            <span id="captionText"></span>
+        </div>
+        <!-- 图片集容器（手机端使用） -->
+        <div class="modal-grid" id="modalGrid" style="display: none;">
+            <div class="grid-container" id="gridContainer"></div>
+        </div>
+        <!-- 文章详情内容 -->
+        <div class="modal-article" id="modalArticle" style="display: none;">
+            <h2 id="articleTitle">文章标题</h2>
+            <div class="date" id="articleDate">日期</div>
+            <div class="content" id="articleContent">文章详细内容...</div>
+            <div class="comments-section">
+                <h3>💬 评论</h3>
+                <div id="commentList"></div>
+                <div class="comment-form">
+                    <input type="text" placeholder="你的昵称" id="commentName">
+                    <textarea rows="3" placeholder="写下你的评论..." id="commentText"></textarea>
+                    <button id="submitComment">发表评论</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        投稿新词条至<a href="https://pome.vip/DozaNoGo" target="_blank" rel="noopener noreferrer">匿名信箱</a><br>加入<a href="https://pd.qq.com/s/1f0b8eqzb?b=9" target="_blank" rel="noopener noreferrer">QQ频道</a><br><a href="https://qm.qq.com/q/AQ8BmrtM30" target="_blank" rel="noopener noreferrer">联系我</a>
+    </footer>
+
+    <script>
+        (function() {
+            // ---------- 工具函数 ----------
+            function isMobile() {
+                return window.innerWidth < 768;
+            }
+
+            // ---------- 标签切换逻辑 ----------
+            const tabBtns = document.querySelectorAll('.tab-btn');
+            const tabPanes = document.querySelectorAll('.tab-pane');
+
+            const savedTab = sessionStorage.getItem('activeTab');
+            if (savedTab) {
+                const targetBtn = document.querySelector(`.tab-btn[data-tab="${savedTab}"]`);
+                const targetPane = document.getElementById(savedTab);
+                if (targetBtn && targetPane) {
+                    tabBtns.forEach(b => b.classList.remove('active'));
+                    tabPanes.forEach(p => p.classList.remove('active'));
+                    targetBtn.classList.add('active');
+                    targetPane.classList.add('active');
+                }
+            }
+
+            tabBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+        tabBtns.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        const target = btn.dataset.tab;
+        tabPanes.forEach(pane => {
+            if (pane.id === target) {
+                pane.classList.add('active');
+            } else {
+                pane.classList.remove('active');
+            }
+        });
+        sessionStorage.setItem('activeTab', target);
+
+        // ---------- 新增：切换到图片页时重新布局 ----------
+        if (target === 'photos') {
+            setTimeout(() => {
+                if (isMobile()) {
+                    // 手机端：重新隐藏多余图片（如果之前显示乱了）
+                    document.querySelectorAll('.card').forEach(card => {
+                        const images = card.querySelectorAll('.card-images img');
+                        if (images.length > 2) {
+                            for (let i = 2; i < images.length; i++) {
+                                images[i].style.display = 'none';
+                            }
+                        }
+                    });
+                } else {
+                    // 电脑端：重新触发 Masonry 布局
+                    if (masonryInstance) {
+                        masonryInstance.layout();
+                    } else {
+                        initMasonry(); // 如果实例不存在，重新初始化
+                    }
+                }
+            }, 100); // 延迟一点等待标签页显示
+        }
+    });
+});
+            // ---------- 初始化瀑布流（只在电脑端）----------
+            const gallery = document.querySelector('#gallery');
+            let masonryInstance = null;
+
+            function initMasonry() {
+    if (!gallery) return;
+    // 先恢复所有图片显示（防止切换屏幕时残留隐藏）
+    document.querySelectorAll('.card-images img').forEach(img => img.style.display = '');
+
+    if (masonryInstance) {
+        masonryInstance.destroy();
+        masonryInstance = null;
+    }
+
+    if (!isMobile()) {
+        // 电脑端：初始化瀑布流
+        imagesLoaded(gallery, function() {
+            masonryInstance = new Masonry(gallery, {
+                itemSelector: '.card',
+                columnWidth: 300,
+                gutter: 24,
+                fitWidth: true
+            });
+        });
+    } else {
+        // 手机端：隐藏每张卡片中超过2张的图片
+        document.querySelectorAll('.card').forEach(card => {
+            const images = card.querySelectorAll('.card-images img');
+            if (images.length > 2) {
+                for (let i = 2; i < images.length; i++) {
+                    images[i].style.display = 'none';
+                }
+            }
+        });
+    }
+}
+            // ---------- 卡片搜索功能 ----------
+const searchInput = document.getElementById('cardSearch');
+if (searchInput) {
+    searchInput.addEventListener('input', function(e) {
+        const keyword = e.target.value.trim().toLowerCase();
+        const cards = document.querySelectorAll('.card');
+        let anyVisible = false;
+
+        cards.forEach(card => {
+            // 获取卡片标题
+            const cardTitle = card.querySelector('.card-title')?.textContent.toLowerCase() || '';
+            // 获取卡片描述
+            const cardDesc = card.querySelector('.card-desc')?.textContent.toLowerCase() || '';
+            // 获取所有图片的 data-title 和 alt
+            const imgTexts = Array.from(card.querySelectorAll('.card-images img')).map(img => 
+                ((img.dataset.title || '') + ' ' + (img.alt || '')).toLowerCase()
+            ).join(' ');
+
+            // 判断是否匹配：关键词为空 或 出现在任一文本中
+            const matches = keyword === '' || 
+                           cardTitle.includes(keyword) || 
+                           cardDesc.includes(keyword) || 
+                           imgTexts.includes(keyword);
+
+            if (matches) {
+                card.style.display = '';
+                anyVisible = true;
+            } else {
+                card.style.display = 'none';
+            }
+        });
+
+        // 没有匹配时显示提示
+        const gallery = document.querySelector('.gallery');
+        let noResultMsg = document.getElementById('noSearchResult');
+        if (!anyVisible && keyword !== '') {
+            if (!noResultMsg) {
+                noResultMsg = document.createElement('div');
+                noResultMsg.id = 'noSearchResult';
+                noResultMsg.style.textAlign = 'center';
+                noResultMsg.style.padding = '2rem';
+                noResultMsg.style.color = '#999';
+                noResultMsg.innerText = '没有找到匹配的卡片';
+                gallery.parentNode.insertBefore(noResultMsg, gallery.nextSibling);
+            }
+        } else {
+            if (noResultMsg) noResultMsg.remove();
+        }
+
+        // 通知 Masonry 重新布局
+        if (typeof masonryInstance !== 'undefined' && masonryInstance) {
+            setTimeout(() => {
+                masonryInstance.layout();
+            }, 10);
+        }
+    });
+}
+            initMasonry();
+            window.addEventListener('resize', initMasonry);
+
+            // ---------- 模态框元素 ----------
+            const modal = document.getElementById('globalModal');
+            const modalImg = document.getElementById('modalImage');
+            const modalArticle = document.getElementById('modalArticle');
+            const modalGrid = document.getElementById('modalGrid');
+            const gridContainer = document.getElementById('gridContainer');
+            const closeBtn = document.getElementById('closeModalBtn');
+            const modalCaption = document.getElementById('modalImageCaption');
+            const captionText = document.getElementById('captionText');
+            const captionIcon = document.querySelector('.caption-icon');
+
+            let currentArticleId = null;
+
+            // ---------- 显示图片集的函数 ----------
+            function showImageGrid(imagesData) {
+                // 隐藏其他内容
+                modalImg.style.display = 'none';
+                modalArticle.style.display = 'none';
+                modalCaption.style.display = 'none';
+                modalGrid.style.display = 'block';
+
+                // 清空并生成网格
+                gridContainer.innerHTML = '';
+                imagesData.forEach((imgData, index) => {
+                    const item = document.createElement('div');
+                    item.className = 'grid-item';
+                    item.innerHTML = `<img src="${imgData.src}" alt="${imgData.title}">`;
+                    item.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        // 切换到单图放大模式
+                        modalImg.src = imgData.src;
+                        modalImg.alt = imgData.title;
+                        modalImg.style.display = 'block';
+                        modalGrid.style.display = 'none';
+
+                        if (imgData.title) {
+                            captionText.textContent = imgData.title;
+                            if (captionIcon) captionIcon.src = imgData.icon;
+                            modalCaption.style.display = 'flex';
+                        } else {
+                            modalCaption.style.display = 'none';
+                        }
+                    });
+                    gridContainer.appendChild(item);
+                });
+
+                modal.classList.add('active');
+            }
+
+            // ---------- 图片交互（区分手机和电脑）----------
+            const cards = document.querySelectorAll('.card');
+            const galleryImages = document.querySelectorAll('.card-images img');
+
+            if (isMobile()) {
+                // 手机端：点击整个卡片进入相册
+                cards.forEach(card => {
+                    card.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        const images = this.querySelectorAll('.card-images img');
+                        const imagesData = Array.from(images).map(img => ({
+                            src: img.dataset.img || img.src,
+                            title: img.dataset.title || '',
+                            icon: img.dataset.icon || 'images/default-icon.png'
+                        }));
+                        showImageGrid(imagesData);
+                    });
+                });
+            } else {
+                // 电脑端：点击图片直接放大
+                galleryImages.forEach(img => {
+                    img.addEventListener('click', function(e) {
+                        e.stopPropagation();
+                        const imgSrc = this.dataset.img;
+                        const title = this.dataset.title || '';
+                        const iconSrc = this.dataset.icon || 'images/default-icon.png';
+
+                        if (imgSrc) {
+                            modalArticle.style.display = 'none';
+                            modalGrid.style.display = 'none';
+                            modalImg.style.display = 'block';
+                            modalImg.src = imgSrc;
+                            modalImg.alt = title;
+
+                            if (title) {
+                                captionText.textContent = title;
+                                if (captionIcon) {
+                                    captionIcon.src = iconSrc;
+                                }
+                                modalCaption.style.display = 'flex';
+                            } else {
+                                modalCaption.style.display = 'none';
+                            }
+
+                            modal.classList.add('active');
+                        }
+                    });
+                });
+            }
+
+             // ---------- 文章卡片点击：显示详情模态框 ----------
+            const articleCards = document.querySelectorAll('.article-card');
+            const articleData = {
+                1: {
+                    title: '主线梗概',
+                    date: '25時、ナイトコードで。',
+                    content: '真冬活在别人的期望里。什么事情都做得到，不管怎么麻烦也不会生气的“好孩子”是在周围环境里的所有人的主观期望下诞生的。\n父母希望她去学体面的医学，她便放弃做看护师的梦想。同学们觉得优等生“没有时间玩乐”，她就放弃和他人去玩的机会。她发现似乎只要满足大家的期望，父母，老师，班里的朋友，大家都会很开心。直到有一天她发现自己体会不到味觉，甚至不再记得爱好，情感和梦想。\n “我”在哪里？ \n日常与25时的成员交流。负责作词。\n在另外一次社团活动快要结束时得知了新星作曲家OWN。听完绘名的评价和自言自语后对绘名表示了肯定和赞扬。\n奏私信询问OWN是不是她，以“我不会选择这样的音色，也写不出这么沉重的歌词”否定了。之后和奏聊起了社团成立时发生的事情，并说出了“那时，我感觉好像被K的曲子拯救了。”的话。\n下线之后觉得自己失言，查看完OWN的评论区后自语道“如果继续作下去，但还是找不到……” \n第二天到学校上学。同学问她“想听真冬自己想说的话”，回答同学说“大家开心的话我也会开心”，被二人评价道“这不是天使是女神”。\n回家后，在与瑞希聊天时母亲进了房间。母亲认为她与差生呆在一起会给她添麻烦，让她珍惜时间，与能竞争的人呆在一起。回来后，对瑞希“被别人强加价值观会不会难受”的疑问，回答说“自己不在意这些”。稍后，与父母吃饭时被问及大学第一志愿的事情，父母边说着“自由选择”边给她塞了他们心仪的大学资料。\n之后她回到房间，陷入黑化状态，告诉未来她想一直呆在「世界」里，然后前往「世界」。在「世界」里待了一周多。\n在这段时间里写了OWN的新曲。之后突然出现在误打误撞来到「世界」的众人面前，直接拒绝掉众人的关心，表示希望一个人呆着，接着承认了自己是OWN，并说自己已无留在Nightcord的必要，“第一次听K的曲子时，感觉稍微有点被拯救了”“但是，还不够，还是找不到”“比谁都想要消失”。最后命令未来将其余三人全部强行送出「世界」。\n 之后又以OWN的名义连续发表了三首曲子，三首都让人寒心异常，被绘名认定这是她要消失的前奏。\n 第二天到学校后，对着同学分享的有趣视频直接说出“是啊，十分无聊”，意识到表现不对后以营业声线掩盖过去。回家之后，母亲告诉真冬她在打扫时发现了合成器，认为是用不上的东西，明天就拿去回收掉；而且在她不知道的情况下给她请了专门教医科大学考生的家庭教师。母亲出门之后，真冬终于到了极限，然后来到了「世界」。\n 向未来坦白自己还是什么都没找到，确信自己还是想消失，被未来反驳。面对出现的奏和瑞希，拒绝试听奏为救她而作的曲子，并再次要求未来把她们赶出去，却被未来拒绝。无意重复了一遍“在找到自我以前K必须一直作曲”，被奏（故意）误当作承诺继续应承下来。听完奏父亲的事情、绘名和瑞希的话以及奏的自白和决心后拾起了一点继续寻找自我的意愿，恢复正常。\n 听到从自己真正的心念里诞生的曲子后，被未来告知这个「世界」是从自己心念中诞生的。之后向未来道谢。\n 回到现实世界后发现Untitled的名字变成了悔やむと書いてミライ，认为这跟之前未来说的“察觉到真实的心念时，歌曲便会从心念而生”有关。 第二天与25时的成员在线下首次见面。点菜时点了和奏一样的食物。\n回去后私信奏说听完了K的曲子，但并未回复奏询问看法的私信，而是直呼奏的名字，感谢奏让她找到了自我。'
+                },
+                2: {
+                    title: '囚われのマリオネット',
+                    date: '被囚禁的蔷薇人偶（第2期活动）',
+                    content: '朝比奈真冬和25众人一起去了人偶展，结果看到提线木偶的时候（因为感受到了自己的影子）而非常难受。\n回到家里梦见了自己在人偶展会场，并且变成了模样精致的提线人偶，就在真冬觉得“变成人偶也没什么不好的”时候宵崎奏出现在梦中，鼓励真冬将自己的感受讲出来。\n真冬醒后和奏交谈讲述自己仿佛丢失了什么，最后在奏的建议下将那些感受写成了歌词，并开始尝试直接地表达自己的感受'
+                },
+                3: {
+                    title: '灯のミラージュ',
+                    date: '灯之幻象（第35期活动）',
+                    content: '真冬对于自己为什么听到奏新写的曲子会笑出来而百思不得其解，这时恰好发烧了，由于过于劳累而倒在路边，被奏接回家里休息。在被奏喂苹果时梦到了小时候生病时被母亲照顾的情景，发现在听到奏的曲子时温暖的心情和小时候的心情很相似。最后真冬把这种感受写成了歌词。虽然还不是完全明白，但真冬又向前迈进了一步。'
+                },
+                4: {
+                    title: '迷い子の手を引く、そのさきは',
+                    date: '牵起迷路之人的手，在那前方的是（第61期活动）',
+                    content: '真冬本来由于和模拟考时间冲突而推掉了和25一起去凤凰乐园的邀请，结果因为母亲发现了自己的合成器并没收而内心开始痛苦动摇。\n在去模拟考的路上又收到了母亲的短信，被压力压得喘不过气的真冬在痛苦中无意识地翘掉了模拟考而去了凤凰乐园找25大家。\n想起小时候和母亲一起来凤凰乐园玩时，由于和母亲走散而被指责不听话并对其进行了恐吓，感觉到的是冰冷，而此时和大家在一起感到十分温暖。结尾谎称自己因不舒服在朋友家里，开始被母亲怀疑'
+                },
+                5: {
+                    title: '仮面の私にさよならを',
+                    date: '与带着面具的我告别（第100期活动）',
+                    content: '期末考试成绩下降得比想象的还要多，于是真冬向母亲撒谎试卷还没批完，想要等下次模拟考中挽回来，并跟大家说会暂停一段时间25时的活动而专心学习。\n然而被母亲发现，母亲打算没收真冬的手机。真冬奋起反抗，在争执时，手机掉到鱼缸里坏掉而彻底失去与大家的联系手段。\n之后KAITO强行进入了坏掉的手机，并告诉真冬再不反抗就完了。被逼到绝路的真冬选择跟母亲说出自己的真实想法，请求母亲让自己继续做音乐，并告诉母亲自己的梦想从来不是做医生，自己想要慢慢思考一个更适合自己的梦想。但没想到母亲仍偏执地以为是奏等人让真冬误入歧途，并哭着生气的喊到“这个世界上对你好的，只有妈妈我啊！”。\n见到母亲开始落泪的真冬就要因为要做好孩子的想法而顺从时，被KAITO点醒，并向母亲说出了自己一直以来的痛苦与迷茫，希望母亲能理解自己的心情。\n在母亲依然不肯让步后，在快要崩溃时听到了未来的歌声，也想起了瑞希的话，选择了逃走，在大雨中被奏找到，暂时住在奏家中。'
+                },
+                6: {
+                    title: '灯を手繰りよせて',
+                    date: '揽灯近前（第134期活动）',
+                    content: '真冬被父亲问及当天发生的事，想说却无法说出口。父亲说会给真冬考虑的时间。\n当晚真冬梦见了父亲和母亲一样否定自己想法，于是意识到自己是因为害怕父亲也不理解自己才不敢说出口。之后被瑞希和镜音铃鼓励相信父亲，也在突如其来的雷鸣后想起了小时候和父亲为数不多的回忆。\n当时的真冬因为打雷而害怕得睡不着觉，多亏了父亲一直守在身旁握着真冬的手，才让真冬安心睡着。\n于是真冬在和众人讨论后之后鼓起勇气告诉了父亲那一天的事，尤其是自己的梦想并不是医生的事，并得到了父亲的理解。'
+                },
+                7: {
+                    title: 'そして、針は動き出す',
+                    date: '于是，指针开始转动（第165期活动）',
+                    content: '真冬的父母讨论即将与女儿会面，母亲表现出希望能理解并尊重真冬的意愿，父亲也强调「只要真心，就一定可以」。\n真冬与父母见面，对母亲长期误解其梦想为「成为医生」表达了自己的真实感受。母亲承认错误，并表示愿意支持真冬真正想做的事。\n父亲邀请真冬回家，并承诺尊重她的想法，真冬决定回家。真冬收拾东西准备搬回家。奏虽感不舍但祝福她。未来和连出现鼓励真冬，真冬表示虽然还有不安，但想相信母亲。\n真冬正式回到家，家中充满温馨气氛。母亲精心准备晚饭，父亲也很开心。虽然真冬仍感到食之无味，但心中感到「温暖」。真冬重新适应学校生活，获得老师表扬。与母亲分享成绩与歌曲创作，母亲表现出兴趣与关心，真冬也逐渐敞开心扉。\n母亲在休息日提议参观美术展，但真冬因社团活动婉拒。母亲虽一时失言，但仍表示支持真冬的选择。\n真冬发现母亲私下收集大学资料，心中再次浮现不安。真冬在夜里察觉母亲的自责，对母亲的努力感到愧疚。她想要回应母亲的温柔，却也因自身混乱的情绪感到困惑。\n母亲积极为真冬寻找学校，并提议参加说明会。真冬表面答应，但心中迷惘，随后向朋友们吐露「其实不知道自己想去哪里」。\n奏拜访朝比奈家用餐，席间揭示真冬其实并不确定想去的学校，引发母亲情绪崩溃。家庭再次陷入误解与愧疚的循环。\n真冬被父亲接到奏家暂住。她陷入自责，无法理解为何无意中又让母亲痛苦。\n剧情以真冬向奏倾诉「我该怎么办」收束。'
+                },
+                8: {
+                    title: '水底に影を探して',
+                    date: '水底寻影（第112期活动）',
+                    content: '几周前真冬父亲就来到奏家，希望真冬能回家跟母亲好好沟通，但真冬却表示自己做不到。\n父亲意识到事情并非自己想得那样简单，便同意真冬暂时住在奏家。之后的时间里，父亲一直定期来探望真冬，但真冬始终不想回去。\n真冬也明白自己不能一直这样下去，但一想到回去要面对母亲就十分痛苦，于是来到SEKAI让自己冷静。在那里真冬遇到了镜音连和KAITO，并被KAITO告诫不要逃避现在的情感。\n这时从某处传来了曲声，真冬和镜音连顺着声音寻找，发现SEKAI不知何时出现了一个湖，声音正是从湖中传来的。\n真冬从湖中捞出了一个绘本，以及医学部的参考书。看到参考书的一刻，真冬就想起了母亲而感到很痛苦，并表示自己不想再来这里了。\n最后，25时四人一同前往了湖边，在奏的鼓励下决心探寻湖中的东西，并找到了绘名为真冬画的画、25时以前的乐谱以及苹果。看到苹果，真冬立刻想到母亲而非常痛苦，却并不想把它扔掉\n。真冬对自己复杂的情感依然不能理解，但也明白这对于找到真正的自己是必需的。'
+                },
+                9: {
+                    title: '泡沫に抱かれて',
+                    date: '与泡沫相拥（第169期活动）',
+                    content: '真冬与众人一起被树苗上的黑色碎片传送到了一个平行世界的梦境中。真冬在这里与母亲早早地坦白了自己不想当医生的事，母亲居然很自然地接受了这件事。也是导致在这个时空里25时没有正常成立的原因之一。\n中途真冬早早地恢复了记忆，但看到大家在这个世界过得都很好，便不忍心告诉大家真相，只是默默地守望着大家，并且在遇到父亲没有生病且没有辍学在家的宵崎奏后，积极地陪着奏一件一件地去尝试她想做的事。\n在听到奏所做的曲子后露出了严肃的表情（似乎是因为感受到了熟悉的感觉，但是为了奏不要再重蹈覆辙，真冬选择了对此隐瞒，在奏担心自己的曲子不能打动真冬使她感到幸福而提出为真冬重新作曲的时候，真冬告诉她“不用再为我作曲了”）。\n最终奏还是回忆起了真实世界的事，并找回了大家，四人终于在Nightcord上重聚，真冬也告诉了大家真相，并承认这个世界里自己会在25点时会感到寂寞。'
+                }
+            };
+            let comments = JSON.parse(localStorage.getItem('articleComments')) || {
+                1: [{ author: '朝比奈まふゆ', time: '2024-11-06 09:15', text: '…谢谢你，找到了我' }],
+                2: [{ author: '朝比奈まふゆ', time: '2025-02-15 10:30', text: '这样啊，不是很懂' }],
+                3: [{ author: '朝比奈まふゆ', time: '2025-01-21 14:22', text: '唔…不要走…' }],
+                4: [{ author: '朝比奈まふゆ', time: '2024-11-06 09:15', text: '…很温暖啊…' }],
+                5: [{ author: '朝比奈まふゆ', time: '2024-11-06 09:15', text: '该怎么办…' }],
+                6: [{ author: '朝比奈まふゆ', time: '2024-11-06 09:15', text: '…非常感谢。' }],
+                7: [{ author: '朝比奈まふゆ', time: '2024-11-06 09:15', text: '想要相信…' }],
+                8: [{ author: 'KAITO', time: '2024-11-06 09:15', text: '别管我' }],
+                9: [{ author: '朝比奈まふゆ', time: '2024-11-06 09:15', text: '' }]
+            };
+            function saveComments() {
+                localStorage.setItem('articleComments', JSON.stringify(comments));
+            }
+
+            function renderComments(articleId) {
+                const commentListDiv = document.getElementById('commentList');
+                const articleComments = comments[articleId] || [];
+                if (articleComments.length === 0) {
+                    commentListDiv.innerHTML = '<p style="color: #95a5a6;">还没有评论，快来抢沙发！</p>';
+                } else {
+                    let html = '';
+                    articleComments.forEach((c, index) => {
+                        html += `
+                            <div class="comment" data-comment-index="${index}">
+                                <div style="display: flex; justify-content: space-between; align-items: center;">
+                                    <div>
+                                        <span class="author">${c.author}</span>
+                                        <span class="time">${c.time}</span>
+                                    </div>
+                                    <button class="delete-comment" data-comment-index="${index}">🗑️</button>
+                                </div>
+                                <p>${c.text}</p>
+                            </div>
+                        `;
+                    });
+                    commentListDiv.innerHTML = html;
+
+                    document.querySelectorAll('.delete-comment').forEach(btn => {
+                        btn.addEventListener('click', function(e) {
+                            e.stopPropagation();
+                            const commentIndex = this.dataset.commentIndex;
+                            comments[currentArticleId].splice(commentIndex, 1);
+                            saveComments();
+                            renderComments(currentArticleId);
+                        });
+                    });
+                }
+            }
+
+            articleCards.forEach(card => {
+                card.addEventListener('click', function() {
+                    const articleId = this.dataset.articleId;
+                    if (!articleId) return;
+                    currentArticleId = articleId;
+                    const data = articleData[articleId];
+                    if (data) {
+                        document.getElementById('articleTitle').textContent = data.title;
+                        document.getElementById('articleDate').textContent = data.date;
+                        document.getElementById('articleContent').textContent = data.content;
+
+                        renderComments(articleId);
+
+                        modalImg.style.display = 'none';
+                        modalGrid.style.display = 'none';
+                        modalCaption.style.display = 'none';
+                        modalArticle.style.display = 'block';
+                        modal.classList.add('active');
+                    }
+                });
+            });
+
+            document.getElementById('submitComment').addEventListener('click', function() {
+                if (!currentArticleId) return;
+                const nameInput = document.getElementById('commentName');
+                const textInput = document.getElementById('commentText');
+                const name = nameInput.value.trim();
+                const text = textInput.value.trim();
+                if (!name || !text) {
+                    alert('昵称和评论不能为空！');
+                    return;
+                }
+
+                const now = new Date();
+                const timeStr = `${now.getFullYear()}-${(now.getMonth()+1).toString().padStart(2,'0')}-${now.getDate().toString().padStart(2,'0')} ${now.getHours().toString().padStart(2,'0')}:${now.getMinutes().toString().padStart(2,'0')}`;
+
+                if (!comments[currentArticleId]) {
+                    comments[currentArticleId] = [];
+                }
+                comments[currentArticleId].push({
+                    author: name,
+                    time: timeStr,
+                    text: text
+                });
+
+                saveComments();
+                renderComments(currentArticleId);
+
+                nameInput.value = '';
+                textInput.value = '';
+            });
+
+            // ---------- 关闭模态框 ----------
+            function closeModal() {
+                modal.classList.remove('active');
+                modalImg.style.display = 'none';
+                modalArticle.style.display = 'none';
+                modalGrid.style.display = 'none';
+                modalCaption.style.display = 'none';
+            }
+
+            closeBtn.addEventListener('click', closeModal);
+            modal.addEventListener('click', function(e) {
+                if (e.target === modal) closeModal();
+            });
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape' && modal.classList.contains('active')) {
+                    closeModal();
+                }
+            });
+
+            // ---------- 音乐播放器逻辑 ----------
+            // 播放列表数据（用户可替换为自己的音乐）
+            let currentCategoryIndex = 0;
+            let currentSongIndex = 0;
+            const playlistData = [
+    {
+        category: "25時、ナイトコードで。",
+        songs: [
+            { title: 'ジャックポットサッドガール', artist: '25時、ナイトコードで。', src: 'music/jackpot_girl.mp3', duration: '3:04' },
+            { title: '再生', artist: '25時、ナイトコードで。', src: 'music/zaisheng.mp3', duration: '4:08' },
+            { title: 'バグ', artist: '25時、ナイトコードで。', src: 'music/bug.mp3', duration: '2:08' },
+            { title: '演劇', artist: '25時、ナイトコードで。', src: 'music/yanju.mp3', duration: '4:42' },
+            { title: 'エンパープル', artist: '25時、nightcordで', src: 'music/empurple.mp3', duration: '1:59' },
+            { title: '虚無さん', artist: '25時、ナイトコードで。', src: 'music/xuwuxiaojie.mp3', duration: '2:17' }
+        ]
+    },
+    {
+        category: "翻唱（anvo）",
+        songs: [
+            { title: '心做し', artist: '朝比奈まふゆ', src: 'music/xinlizuoyong.mp3', duration: '2:17' },
+            { title: 'アイロニ (Game size.)', artist: '朝比奈まふゆ', src: 'music/fanyu.mp3', duration: '2:23' },
+            { title: '命ばっかり', artist: '朝比奈まふゆ', src: 'music/ziweishengming.mp3', duration: '3:04' },
+            { title: 'ド屑 (feat. 朝比奈まふゆ)', artist: '朝比奈まふゆ', src: 'music/darenzha.mp3', duration: '4:08' },
+            { title: '神っぽいな (Game size.)', artist: '朝比奈まふゆ', src: 'music/sheng.mp3', duration: '2:08' },
+            { title: '悔やむと書いてミライ', artist: '朝比奈まふゆ', src: 'music/huishu.mp3', duration: '4:08' },
+            { title: 'アイディスマイル', artist: '朝比奈まふゆ', src: 'music/ids.mp3', duration: '2:08' },
+            { title: 'カトラリー', artist: '朝比奈まふゆ', src: 'music/canju.mp3', duration: '4:42' },
+            
+            { title: 'カナデトモスソラ', artist: '朝比奈まふゆ', src: 'music/zouming.mp3', duration: '2:17' },
+            { title: '乙女解剖', artist: '朝比奈まふゆ', src: 'music/yinvjiepou.mp3', duration: '2:17' }
+        ]
+    },
+    {
+        category: "anvo（箱曲）",
+        songs: [
+            { title: 'ジャックポットサッドガール', artist: '朝比奈まふゆ', src: 'music/jackpot_girl_anvo.mp3', duration: '3:04' },
+            { title: '再生', artist: '朝比奈まふゆ', src: 'music/zaisheng_anvo_.mp3', duration: '4:08' },
+            { title: 'バグ', artist: '朝比奈まふゆ', src: 'music/bug_anvo.mp3', duration: '2:08' },
+            { title: '演劇', artist: '朝比奈まふゆ', src: 'music/yanju_anvo.mp3', duration: '4:42' },
+            { title: 'エンパープル', artist: '朝比奈まふゆ', src: 'music/empurple_anvo.mp3', duration: '1:59' },
+            { title: '虚無さん', artist: '朝比奈まふゆ', src: 'music/xuwuxiaojie_anvo.mp3', duration: '1:34' }
+        ]
+    }
+];
+
+            let currentIndex = 0;
+            const audio = new Audio();
+            let isPlaying = false;
+
+            // DOM 元素
+            const playPauseBtn = document.getElementById('playPauseBtn');
+            const prevBtn = document.getElementById('prevBtn');
+            const nextBtn = document.getElementById('nextBtn');
+            const currentSongTitle = document.getElementById('currentSongTitle');
+            const currentSongArtist = document.getElementById('currentSongArtist');
+            const progressFill = document.getElementById('progressFill');
+            const currentTimeSpan = document.getElementById('currentTime');
+            const durationSpan = document.getElementById('duration');
+            const progressBar = document.getElementById('progressBar');
+            const playlistDiv = document.getElementById('playlistItems');
+
+            // 初始化播放列表
+            function renderPlaylist() {
+    let html = '';
+    playlistData.forEach((category, catIndex) => {
+        // 分类标题（带折叠状态标志）
+        html += `
+            <div class="category-item" data-cat-index="${catIndex}">
+                <div class="category-header">
+                    <span class="collapse-icon">▼</span>
+                    <span class="category-name">${category.category}</span>
+                </div>
+                <div class="song-list" style="display: block;">  <!-- 默认展开，可改为 display: none 默认折叠 -->
+        `;
+        
+        // 该分类下的歌曲
+        category.songs.forEach((track, songIndex) => {
+            // 使用全局索引或使用分类内索引？为了播放切换方便，我们可以计算一个全局索引
+            // 但最好还是根据分类+歌曲索引来播放，所以我们需要修改播放逻辑
+            // 暂时我们先展示，后面再处理播放
+            html += `
+                <div class="playlist-item" data-cat-index="${catIndex}" data-song-index="${songIndex}">
+                    <span class="track-number">${songIndex+1}</span>
+                    <div class="track-info">
+                        <div class="track-title">${track.title}</div>
+                        <div class="track-artist">${track.artist}</div>
+                    </div>
+                    <span class="track-duration">${track.duration}</span>
+                </div>
+            `;
+        });
+        
+        html += `</div></div>`; // 关闭 song-list 和 category-item
+    });
+    playlistDiv.innerHTML = html;
+
+    // 为分类标题绑定折叠事件
+    document.querySelectorAll('.category-header').forEach(header => {
+        header.addEventListener('click', function() {
+            const songList = this.nextElementSibling; // 紧邻的 .song-list
+            const icon = this.querySelector('.collapse-icon');
+            if (songList.style.display === 'none') {
+                songList.style.display = 'block';
+                icon.textContent = '▼';
+            } else {
+                songList.style.display = 'none';
+                icon.textContent = '▶';
+            }
+        });
+    });
+
+    // 为歌曲项绑定点击事件（播放）
+    document.querySelectorAll('.playlist-item').forEach(item => {
+        item.addEventListener('click', function() {
+            const catIndex = this.dataset.catIndex;
+            const songIndex = this.dataset.songIndex;
+            // 根据分类和歌曲索引播放
+            playSongByCategory(catIndex, songIndex);
+        });
+    });
+}
+            // 暂停
+            function pauseTrack() {
+                audio.pause();
+                isPlaying = false;
+                playPauseBtn.innerHTML = '▶';
+            }
+            // 播放
+           function playTrack() {
+                audio.play().then(() => {
+                      isPlaying = true;
+                      playPauseBtn.innerHTML = '❚❚';
+                }).catch(e => console.log('播放失败：', e));
+           }
+
+            function togglePlay() {
+             if (isPlaying) {
+                    pauseTrack();
+                    } else {
+                             if (audio.src) {
+                                   playTrack();
+                    } else {
+            // 如果没有加载任何歌曲，先加载第一首（第一个分类的第一首）
+                     currentCategoryIndex = 0;
+                     currentSongIndex = 0;
+                     loadTrack();
+                           playTrack();
+                             }
+                     }
+            }
+
+            // 上一首
+            function prevTrack() {
+    // 先尝试在当前分类内上一首
+    if (currentSongIndex > 0) {
+        currentSongIndex--;
+    } else {
+        // 切换到上一个分类的最后一首
+        if (currentCategoryIndex > 0) {
+            currentCategoryIndex--;
+            currentSongIndex = playlistData[currentCategoryIndex].songs.length - 1;
+        } else {
+            // 已经是第一个分类的第一首，循环到最后一个分类的最后一首
+            currentCategoryIndex = playlistData.length - 1;
+            currentSongIndex = playlistData[currentCategoryIndex].songs.length - 1;
+        }
+    }
+    loadTrack();
+    if (isPlaying) playTrack();
+}
+
+            function nextTrack() {
+    // 在当前分类内下一首
+    if (currentSongIndex < playlistData[currentCategoryIndex].songs.length - 1) {
+        currentSongIndex++;
+    } else {
+        // 切换到下一个分类的第一首
+        if (currentCategoryIndex < playlistData.length - 1) {
+            currentCategoryIndex++;
+            currentSongIndex = 0;
+        } else {
+            // 已经是最后一个分类的最后一首，循环到第一个分类的第一首
+            currentCategoryIndex = 0;
+            currentSongIndex = 0;
+        }
+    }
+    loadTrack();
+    if (isPlaying) playTrack();
+}
+         function playSongByCategory(catIndex, songIndex) {
+         currentCategoryIndex = parseInt(catIndex);
+    currentSongIndex = parseInt(songIndex);
+    loadTrack();
+    playTrack();
+}
+            function loadTrack() {
+    const track = playlistData[currentCategoryIndex].songs[currentSongIndex];
+    audio.src = track.src;
+    audio.load();
+    currentSongTitle.textContent = track.title;
+    currentSongArtist.textContent = track.artist;
+    // 更新播放列表高亮
+    document.querySelectorAll('.playlist-item').forEach(item => {
+        item.classList.remove('active');
+    });
+    const activeItem = document.querySelector(`.playlist-item[data-cat-index="${currentCategoryIndex}"][data-song-index="${currentSongIndex}"]`);
+     if (activeItem) activeItem.classList.add('active');
+}
+
+            // 更新进度条和时间
+            audio.addEventListener('timeupdate', () => {
+                if (audio.duration) {
+                    const percent = (audio.currentTime / audio.duration) * 100;
+                    progressFill.style.width = percent + '%';
+                    
+                    const currentMin = Math.floor(audio.currentTime / 60);
+                    const currentSec = Math.floor(audio.currentTime % 60).toString().padStart(2, '0');
+                    currentTimeSpan.textContent = `${currentMin}:${currentSec}`;
+                    
+                    const durationMin = Math.floor(audio.duration / 60);
+                    const durationSec = Math.floor(audio.duration % 60).toString().padStart(2, '0');
+                    durationSpan.textContent = `${durationMin}:${durationSec}`;
+                }
+            });
+
+            // 歌曲结束时自动下一首
+            audio.addEventListener('ended', () => {
+                nextTrack();
+            });
+
+            // 点击进度条跳转
+            progressBar.addEventListener('click', (e) => {
+                const rect = progressBar.getBoundingClientRect();
+                const clickX = e.clientX - rect.left;
+                const width = rect.width;
+                const percent = clickX / width;
+                if (audio.duration) {
+                    audio.currentTime = percent * audio.duration;
+                }
+            });
+
+            // 按钮事件
+            playPauseBtn.addEventListener('click', togglePlay);
+            prevBtn.addEventListener('click', prevTrack);
+            nextBtn.addEventListener('click', nextTrack);
+
+            // 初始化播放列表和第一首歌
+            renderPlaylist();
+            currentCategoryIndex = 0;
+            currentSongIndex = 0;
+            loadTrack();  // 加载但不自动播放
+            })();
+    </script>
+</body>
+</html>
