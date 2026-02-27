@@ -10,73 +10,72 @@
     <title>朝比奈真冬</title>
     <style>
         /* ---------- 全局样式 ---------- */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        body {
-            font-family: 'Segoe UI', Roboto, system-ui, sans-serif;
-            background: #f5f7fa;
-            color: #1e2b3a;
-            line-height: 1.6;
-        }
-        header {
-            background: linear-gradient(145deg, #894399, #8888cc);
-            color: white;
-            padding: 2rem 2rem;
-            text-align: center;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-        }
-        header h1 {
-            font-size: 2.5rem;
-            letter-spacing: 2px;
-        }
+        /* ---------- 全局样式 ---------- */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
 
-        /* ---------- 标签导航 ---------- */
-        .tabs {
-            display: flex;
-            justify-content: center;
-            gap: 1rem;
-            margin: 2rem 0 0.5rem;
-            flex-wrap: wrap;
-        }
-        .tab-btn {
-            background: #eef2f6;
-            border: none;
-            padding: 12px 32px;
-            font-size: 1.2rem;
-            font-weight: 600;
-            border-radius: 40px;
-            cursor: pointer;
-            transition: all 0.2s;
-            color: #2c3e50;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
-            border: 1px solid #d0ddee;
-        }
-        .tab-btn.active {
-            background: #8888cc;
-            color: white;
-            border-color: #1e2a36;
-            box-shadow: 0 6px 10px rgba(0,0,0,0.1);
-        }
-        .tab-btn:hover {
-            background: #d0ddee;
-        }
+body {
+    font-family: 'Segoe UI', Roboto, system-ui, sans-serif;
+    background-color: #f5f7fa;
+    color: #1e2b3a;
+    line-height: 1.6;
+    min-height: 100vh;
+    position: relative;
+    background-size: cover;
+    background-attachment: fixed;
+    background-position: center;
+}
 
-        /* ---------- 标签内容容器 ---------- */
-        .tab-content {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 1rem;
-        }
-        .tab-pane {
-            display: none;
-        }
-        .tab-pane.active {
-            display: block;
-        }
+/* ---------- 标签导航 ---------- */
+.tabs {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    margin: 2rem 0 0.5rem;
+    flex-wrap: wrap;
+}
 
+.tab-btn {
+    background: #eef2f6;
+    border: none;
+    padding: 12px 32px;
+    font-size: 1.2rem;
+    font-weight: 600;
+    border-radius: 40px;
+    cursor: pointer;
+    transition: all 0.2s;
+    color: #2c3e50;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+    border: 1px solid #d0ddee;
+}
+
+.tab-btn.active {
+    background: #8888cc;
+    color: white;
+    border-color: #1e2a36;
+    box-shadow: 0 6px 10px rgba(0,0,0,0.1);
+}
+
+.tab-btn:hover {
+    background: #d0ddee;
+}
+
+/* ---------- 标题 ---------- */
+header {
+    background: linear-gradient(145deg, #894399, #8888cc);
+    color: white;
+    padding: 2rem;
+    text-align: center;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+}
+
+header h1 {
+    font-size: 2.5rem;
+    letter-spacing: 2px;
+}
         /* ---------- 图片库卡片样式 ---------- */
         .gallery {
             display: block;
@@ -1443,6 +1442,63 @@
             }, 100); // 延迟一点等待标签页显示
         }
     });
+});         
+            // ---------- 随机背景图 ----------
+function setRandomBackground() {
+    // 定义横屏图和竖屏图数组
+    const desktopImages = [
+        'images/b1.png',
+        'images/b2.png',
+        'images/b3.png',
+        'images/b4.png',
+        'images/b5.png',
+        'images/b8.png',
+        'images/b7.png',
+        'images/b9.png',
+        'images/b11.png',
+        'images/b12.png',
+        'images/b13.png',
+        'images/b14.png',
+        'images/b16.png',
+        'images/b17.png',
+        'images/b18.png',
+        'images/b19.png',
+        'images/b21.png',
+        'images/b22.png',
+    ];
+    const mobileImages = [
+        'images/b10.png',
+        'images/b59.png',
+        'images/b61.png',
+        'images/b62.png',
+        'images/b63.png',
+        'images/b15.png',
+        'images/b27.png',
+        'images/b23.png',
+        'images/b26.png',
+        'images/b28.png'
+    ];
+
+    // 判断屏幕宽度（与你的 isMobile 函数保持一致）
+    const isMobile = window.innerWidth < 768;
+    const imageList = isMobile ? mobileImages : desktopImages;
+
+    // 随机选一张
+    const randomIndex = Math.floor(Math.random() * imageList.length);
+    const selectedImage = imageList[randomIndex];
+
+    // 设置 body 背景
+    document.body.style.backgroundImage = `url('${selectedImage}')`;
+}
+
+// 页面加载时执行
+setRandomBackground();
+
+// 窗口大小改变时重新选择（可选，如果你想在旋转屏幕时也切换）
+window.addEventListener('resize', function() {
+    // 重新判断并随机选择（但可能导致背景突变，可以去掉）
+    // 或者只重新根据当前屏幕尺寸从已选组中再随机一次
+    // 为简化，这里不自动重新选择，只保留页面加载时的一次随机
 });
             // ---------- 初始化瀑布流（只在电脑端）----------
             const gallery = document.querySelector('#gallery');
